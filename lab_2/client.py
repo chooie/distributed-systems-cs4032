@@ -25,7 +25,7 @@ def worker(num, ip, port, message):
 if __name__ == "__main__":
 
     threads = []
-    for i in range(5):
+    for i in range(NUMBER_OF_CLIENTS):
         message = "HELO text: {}\n".format(i)
         t = threading.Thread(
             target = worker,
@@ -33,9 +33,10 @@ if __name__ == "__main__":
         )
         threads.append(t)
         t.start()
+
     t = threading.Thread(
             target = worker,
-            args = (i, HOST, PORT_NUMBER, "KILL_SERVICE\n")
+            args = (NUMBER_OF_CLIENTS, HOST, PORT_NUMBER, "KILL_SERVICE\n")
     )
-    threads.append(t)
     t.start()
+    threads.append(t)
