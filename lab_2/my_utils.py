@@ -1,8 +1,7 @@
-def formatDataToMessage(data, host, port, studentID):
-    if data == "KILL_SERVICE\n":
-        print "Kill Request"
-        exit(0)
+def checkIfKillCommand(data):
+    return data == "KILL_SERVICE\n"
 
+def formatDataToMessage(data, host, port, studentID):
     # Convert data to uppercase
     uppercaseData = data.upper()
 

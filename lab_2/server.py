@@ -1,6 +1,7 @@
 import sys
+import os
 import SocketServer
-from my_utils import formatDataToMessage
+from my_utils import formatDataToMessage, checkIfKillCommand
 
 BUFFER_SIZE = 1024;
 HOST = "0.0.0.0"
@@ -23,6 +24,9 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         self.data = self.request.recv(BUFFER_SIZE)
 
         print self.data
+
+        if checkIfKillCommand(self.data):
+            os._exit(0)
 
         response = formatDataToMessage(
             self.data, HOST, PORT_NUMBER, STUDENT_NUMBER

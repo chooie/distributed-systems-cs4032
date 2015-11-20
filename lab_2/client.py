@@ -33,3 +33,9 @@ if __name__ == "__main__":
         )
         threads.append(t)
         t.start()
+    t = threading.Thread(
+            target = worker,
+            args = (i, HOST, PORT_NUMBER, "KILL_SERVICE\n")
+    )
+    threads.append(t)
+    t.start()
