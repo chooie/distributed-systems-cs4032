@@ -1,17 +1,14 @@
 import sys
 import os
 import Queue
+import threading
 import SocketServer
-from my_utils import formatDataToMessage, checkIfKillCommand
+from my_utils import isKillCommand
+from server_worker import serverWorker
 
 BUFFER_SIZE = 1024
 HOST = "0.0.0.0"
 PORT_NUMBER = 8080
-STUDENT_NUMBER = 1234567890
-
-MAX_NUM_OF_THREADS = 10
-
-# TODO: Implement thread pool
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     """
@@ -27,22 +24,15 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(BUFFER_SIZE)
 
-        if checkIfKillCommand(self.data):
+        if isKillCommand(self.data):
             os._exit(0)
 
         # Create worker thread
         t = threading.Thread(
             target = serverWorker,
-            args = (HOST, PORT_NUMBER, message)
+            args = (HOST, PORT_NUMBER, self)
         )
         t.start()
-
-        response = formatDataToMessage(
-            self.data, HOST, PORT_NUMBER, STUDENT_NUMBER
-        )
-
-        # Respond to client
-        self.request.sendall(response)
 
 if __name__ == "__main__":
 

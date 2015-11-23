@@ -1,4 +1,4 @@
-def checkIfKillCommand(data):
+def isKillCommand(data):
     return data == "KILL_SERVICE\n"
 
 def formatDataToMessage(data, host, port, studentID):

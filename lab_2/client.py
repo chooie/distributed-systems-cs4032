@@ -34,6 +34,7 @@ if __name__ == "__main__":
         threads.append(t)
         t.start()
 
+    # Send kill message
     t = threading.Thread(
             target = worker,
             args = (NUMBER_OF_CLIENTS, HOST, PORT_NUMBER, "KILL_SERVICE\n")
