@@ -8,16 +8,16 @@ BUFFER_SIZE = 1024;
 HOST = "0.0.0.0"
 PORT_NUMBER = 8080
 
-NUMBER_OF_CLIENTS = 10
+NUMBER_OF_CLIENTS = 20
 
 def worker(num, ip, port, message):
+    sleep(randint(1, 5))
     sys.stdout.write("Worker: {0}\n".format(num))
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
     try:
         sock.sendall(message)
         response = sock.recv(BUFFER_SIZE)
-        sleep(randint(1, 5))
         sys.stdout.write(response + "\n")
     finally:
         sock.close()
@@ -34,7 +34,8 @@ if __name__ == "__main__":
         threads.append(t)
         t.start()
 
-    # Send kill message
+    # Send kill message after 10 secs
+    sleep(10)
     t = threading.Thread(
             target = worker,
             args = (NUMBER_OF_CLIENTS, HOST, PORT_NUMBER, "KILL_SERVICE\n")
