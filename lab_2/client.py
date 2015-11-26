@@ -5,8 +5,8 @@ import socket
 import threading
 
 BUFFER_SIZE = 1024;
-HOST = "10.6.26.213"
-PORT_NUMBER = 8080
+HOST = "46.101.58.11"
+PORT_NUMBER = 80
 
 NUMBER_OF_CLIENTS = 20
 

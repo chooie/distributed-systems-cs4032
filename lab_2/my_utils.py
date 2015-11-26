@@ -2,7 +2,7 @@ def isKillCommand(data):
     return data == "KILL_SERVICE\n"
 
 def isHELOtext(data):
-    return data == "HELO text\n"
+    return data[:4] == "HELO\n"
 
 def formatDataToMessage(data, host, port, studentID):
 
