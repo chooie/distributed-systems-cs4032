@@ -11,7 +11,12 @@ def serverWorker(host, port, serverThread):
         serverThread.data, host, port, STUDENT_NUMBER
     )
 
-    sys.stdout.write("Processed:\n{0}".format(serverThread.data))
+    processedStr = "Processed:\n{0}"
+
+    if serverThread.data[-2:] != "\n":
+        processedStr += "\n"
+
+    sys.stdout.write(processedStr.format(serverThread.data))
 
     # Respond to client
     serverThread.request.sendall(response)

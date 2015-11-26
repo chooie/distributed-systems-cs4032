@@ -21,13 +21,21 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(BUFFER_SIZE)
 
-        sys.stdout.write("Processing Request:\n{0}".format(self.data))
+        processingStr = "Processing Request:\n{0}"
+        refusalStr = "Refused:\n{0}"
+
+        if self.data[-2:] != "\n":
+            processingStr += "\n"
+            refusalStr += "\n"
+
+        sys.stdout.write(processingStr.format(self.data))
         if isKillCommand(self.data):
             sys.stdout.write("Kill Request!")
             os._exit(0)
 
+
         if (not semaphore.acquire(DO_NOT_BLOCK)):
-            sys.stdout.write("Refused:\n{0}".format(self.data))
+            sys.stdout.write(refusalStr.format(self.data))
             self.request.send("Connection Refused\n")
             self.request.close();
             return;

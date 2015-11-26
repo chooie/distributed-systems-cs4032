@@ -1,19 +1,29 @@
 def isKillCommand(data):
     return data == "KILL_SERVICE\n"
 
+def isHELOtext(data):
+    return data == "HELO text\n"
+
 def formatDataToMessage(data, host, port, studentID):
-    # Convert data to uppercase
-    uppercaseData = data.upper()
 
-    # Format message
-    info = (
-        "IP:{0}\n"
-        "Port:{1}\n"
-        "StudentID:{2}\n"
-    )
+    response = data;
 
-    response = uppercaseData + info
+    if isHELOtext(data):
+        # Convert data to uppercase
+        uppercaseResponse = response.upper()
 
-    response = response.format(host, port, studentID)
+        # Format message
+        info = (
+            "IP:{0}\n"
+            "Port:{1}\n"
+            "StudentID:{2}\n"
+        )
+
+        response = uppercaseResponse + info
+
+        response = response.format(host, port, studentID)
+
+    else:
+        response = response + " - Processed!"
 
     return response
