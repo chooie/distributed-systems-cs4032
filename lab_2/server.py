@@ -6,8 +6,8 @@ from my_utils import isKillCommand
 from server_worker import serverWorker
 
 BUFFER_SIZE = 1024
-HOST = "46.101.58.11"
-PORT = 80
+HOST = "0.0.0.0"
+PORT = 8080
 MAX_NUMBER_OF_CLIENTS = 10
 DO_NOT_BLOCK = False
 

@@ -2,7 +2,7 @@ def isKillCommand(data):
     return data == "KILL_SERVICE\n"
 
 def isHELOtext(data):
-    return data[:4] == "HELO\n"
+    return data[:4] == "HELO"
 
 def formatDataToMessage(data, host, port, studentID):
 
@@ -10,7 +10,7 @@ def formatDataToMessage(data, host, port, studentID):
 
     if isHELOtext(data):
         # Convert data to uppercase
-        uppercaseResponse = response.upper()
+        # uppercaseResponse = response.upper()
 
         # Format message
         info = (
@@ -19,7 +19,7 @@ def formatDataToMessage(data, host, port, studentID):
             "StudentID:{2}\n"
         )
 
-        response = uppercaseResponse + info
+        response += info
 
         response = response.format(host, port, studentID)
 
