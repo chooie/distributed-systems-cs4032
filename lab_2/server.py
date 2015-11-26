@@ -33,7 +33,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             sys.stdout.write("Kill Request!")
             os._exit(0)
 
-
+        # Attempt to acquire semaphore
         if (not semaphore.acquire(DO_NOT_BLOCK)):
             sys.stdout.write(refusalStr.format(self.data))
             self.request.send("Connection Refused\n")
@@ -41,7 +41,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             return;
 
         # Do Work
-        serverWorker(HOST, PORT, self)
+        serverWorker(HOST, PORT, self, semaphore)
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     request_queue_size = 100

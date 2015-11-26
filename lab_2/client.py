@@ -5,7 +5,7 @@ import socket
 import threading
 
 BUFFER_SIZE = 1024;
-HOST = "0.0.0.0"
+HOST = "10.6.26.213"
 PORT_NUMBER = 8080
 
 NUMBER_OF_CLIENTS = 20
@@ -38,10 +38,10 @@ if __name__ == "__main__":
         t.start()
 
     # Send kill message after 10 secs
-    sleep(10)
-    t = threading.Thread(
-            target = worker,
-            args = (NUMBER_OF_CLIENTS, HOST, PORT_NUMBER, "KILL_SERVICE\n")
-    )
-    t.start()
-    threads.append(t)
+    # sleep(10)
+    # t = threading.Thread(
+    #         target = worker,
+    #         args = (NUMBER_OF_CLIENTS, HOST, PORT_NUMBER, "KILL_SERVICE\n")
+    # )
+    # t.start()
+    # threads.append(t)

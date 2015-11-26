@@ -5,7 +5,7 @@ from time import sleep
 
 STUDENT_NUMBER = 1234567890
 
-def serverWorker(host, port, serverThread):
+def serverWorker(host, port, serverThread, semaphore):
     sleep(randint(0, 3))
     response = formatDataToMessage(
         serverThread.data, host, port, STUDENT_NUMBER
@@ -20,3 +20,6 @@ def serverWorker(host, port, serverThread):
 
     # Respond to client
     serverThread.request.sendall(response)
+
+    # Release semaphore
+    semaphore.release()
