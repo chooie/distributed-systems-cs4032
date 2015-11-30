@@ -1,9 +1,8 @@
 import sys
-import os
 import threading
 import SocketServer
 import server_utils as utils
-from server_worker import serverWorker
+from server_worker import server_worker
 
 BUFFER_SIZE = 1024
 HOST = "0.0.0.0"
@@ -14,39 +13,45 @@ DO_NOT_BLOCK = False
 # If semaphore blocks, client's connection will be refused
 semaphore = threading.BoundedSemaphore(MAX_NUMBER_OF_CLIENTS)
 
+
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+    def __init__(self, client_address, request, server):
+        self.data = None
+        SocketServer.BaseRequestHandler.\
+            __init__(self, client_address, request, server)
 
     def handle(self):
 
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(BUFFER_SIZE)
 
-        processingStr = "Processing Request:\n{0}"
-        refusalStr = "Refused:\n{0}"
+        processing_str = "Processing Request:\n{0}"
 
         if self.data[-2:] != "\n":
-            processingStr += "\n"
-            refusalStr += "\n"
+            processing_str += "\n"
 
-        sys.stdout.write(processingStr.format(self.data))
+        sys.stdout.write(processing_str.format(self.data))
 
-        if utils.isKillCommand(self.data):
-            utils.killServer();
+        if utils.is_kill_command(self.data):
+            utils.kill_server()
 
         # Attempt to acquire semaphore
-        if (not semaphore.acquire(DO_NOT_BLOCK)):
-            utils.refuseConnection(self)
-            return;
+        if not semaphore.acquire(DO_NOT_BLOCK):
+            utils.refuse_connection(self)
+            return
 
         # Do Work
-        serverWorker(HOST, PORT, self, semaphore)
+        server_worker(HOST, PORT, self, semaphore)
+
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     request_queue_size = 100
     allow_reuse_address = True
     pass
 
-if __name__ == "__main__":
+
+def main():
+    server = None
 
     try:
         server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler)
@@ -60,7 +65,10 @@ if __name__ == "__main__":
         server_thread.start()
         print "Server loop running in thread:", server_thread.name
         while True:
-            #loop forever
+            # loop forever
             pass
     except (KeyboardInterrupt, SystemExit):
-        utils.cleanUpServer(server)
+        utils.clean_up_server(server)
+
+if __name__ == "__main__":
+    main()

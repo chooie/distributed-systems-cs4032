@@ -1,19 +1,27 @@
-import sys;
-import os;
+import sys
 
-def isKillCommand(data):
+
+def is_kill_command(data):
     return data == "KILL_SERVICE\n"
 
-def killServer():
-    sys.stdout.write("Kill Request!")
-    os._exit(0)
 
-def cleanUpServer(server):
+def kill_server():
+    sys.stdout.write("Kill Request!")
+    sys.exit()
+
+
+def clean_up_server(server):
     server.shutdown()
     server.server_close()
-    sys.exit
+    sys.exit()
 
-def refuseConnection(thread):
-    sys.stdout.write(refusalStr.format(thread.data))
+
+def refuse_connection(thread):
+    refusal_str = "Refused:\n{0}"
+
+    if thread.data[-2:] != "\n":
+        refusal_str += "\n"
+
+    sys.stdout.write(refusal_str.format(thread.data))
     thread.request.send("Connection Refused\n")
-    thread.request.close();
+    thread.request.close()
