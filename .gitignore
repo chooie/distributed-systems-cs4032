@@ -3,3 +3,6 @@
 
 # Webstorm IDE
 .idea/
+
+# Ignore Python Bytecode
+*.pyc
