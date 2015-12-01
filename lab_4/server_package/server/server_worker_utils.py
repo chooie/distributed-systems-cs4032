@@ -1,4 +1,13 @@
-def create_joined_chat_room_message(chat_room_name, chat_room_id, client_id):
+from functools import partial
+from collections import OrderedDict
+
+
+def create_joined_chat_room_message(values):
+    chat_room_name = values["JOIN_CHATROOM"]
+
+    # TODO: come up with way of creating ids
+    chat_room_id = "12345"
+    client_id = "54321"
     return (
             "JOINED_CHATROOM: {0}\n"
             "SERVER_IP: 0\n"
@@ -8,14 +17,10 @@ def create_joined_chat_room_message(chat_room_name, chat_room_id, client_id):
         ).format(chat_room_name, chat_room_id, client_id)
 
 
-def is_chat_join_message(message):
-    message_lines = message.split('\n')
-    return message_lines[0].split(':')[0] == "JOIN_CHATROOM"
-
-
 def message_to_dict(message):
-    message_dict = dict()
+    message_dict = OrderedDict()
     message_lines = message.split('\n')
+
     # Remove last newline
     message_lines = message_lines[:-1]
     for message_line in message_lines:
@@ -29,16 +34,31 @@ def message_to_dict(message):
     return message_dict
 
 
-def process_message(message):
+def get_message_dict_type(values):
+    print values.keys()
+    return values.keys()[0]
 
+
+def do_nothing():
+    return "DEFAULT"
+
+
+def create_response_message_from_type(message):
     values = message_to_dict(message)
 
-    # TODO recognise message type
-    if values.get("JOIN_CHATROOM"):
-        print "JOIN REQUEST"
-    elif values.get("LEAVE_CHATROOM"):
-        print "LEAVE REQUEST"
-    elif values.get("DISCONNECT"):
-        print "DISCONNECT REQUEST"
-    elif values.get("CHAT"):
-        print "CHAT REQUEST"
+    ops = {
+        "JOIN_CHATROOM": partial(create_joined_chat_room_message, values),
+        "LEAVE_CHATROOM": partial(do_nothing),
+        "DISCONNECT": partial(do_nothing),
+        "CHAT": partial(do_nothing)
+    }
+
+    message_type = get_message_dict_type(values)
+
+    response = ops[message_type]()
+
+    print response
+
+
+def process_message(message):
+    response = create_response_message_from_type(message)

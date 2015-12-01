@@ -27,7 +27,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(BUFFER_SIZE)
 
-        log.processing(self.data)
+        # log.processing(self.data)
 
         if utils.is_kill_command(self.data):
             utils.kill_server()

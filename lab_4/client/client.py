@@ -3,7 +3,7 @@ from random import randint
 from time import sleep
 import socket
 import threading
-from client_utils import create_join_chat_room_message
+import client_utils as utils
 
 BUFFER_SIZE = 1024
 HOST = "0.0.0.0"
@@ -27,10 +27,47 @@ def client_worker(ip, port, message):
 def main():
     threads = []
 
-    # Create Client 'bill'
+    # Create client, 'bill'
     room = "programming"
     client = "bill123"
-    message = create_join_chat_room_message(room, client)
+    message = utils.create_join_chat_room_message(room, client)
+    sys.stdout.write(message)
+    t = threading.Thread(
+            target=client_worker,
+            args=(HOST, PORT_NUMBER, message)
+        )
+    threads.append(t)
+    t.start()
+
+    # Create client, mary
+    room = "programming"
+    client = "mary123"
+    message = utils.create_leave_chat_room_message(room, 0, client)
+    sys.stdout.write(message)
+    t = threading.Thread(
+            target=client_worker,
+            args=(HOST, PORT_NUMBER, message)
+        )
+    threads.append(t)
+    t.start()
+
+    # Create client, jack
+    room = "programming"
+    client = "jack123"
+    message = utils.create_disconnect_chat_room_message(client)
+    sys.stdout.write(message)
+    t = threading.Thread(
+            target=client_worker,
+            args=(HOST, PORT_NUMBER, message)
+        )
+    threads.append(t)
+    t.start()
+
+    # Create client, bobby
+    room = "programming"
+    client = "bobby123"
+    message = "Hello, world!"
+    message = utils.create_message_chat_room_message(room, 0, client, message)
     sys.stdout.write(message)
     t = threading.Thread(
             target=client_worker,

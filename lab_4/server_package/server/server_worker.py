@@ -13,10 +13,10 @@ def server_worker(host, port, server_thread, semaphore):
     # TODO: parse message
     utils.process_message(message)
 
-    log.processed(message)
+    # log.processed(message)
 
     # TODO: pass real parameters
-    response = utils.create_joined_chat_room_message("room", "id", 0)
+    response = "Message received"
 
     # Respond to client
     server_thread.request.sendall(response)
