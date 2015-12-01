@@ -1,6 +1,7 @@
 import sys
 from random import randint
 from time import sleep
+import errno
 import socket
 import threading
 import client_utils as utils
@@ -20,61 +21,110 @@ def client_worker(ip, port, message):
         sock.sendall(message)
         response = sock.recv(BUFFER_SIZE)
         sys.stdout.write(response + "\n")
-    finally:
+    except socket.error, e:
+        if isinstance(e.args, tuple):
+            print "Error number is is %d" % e[0]
+            if e[0] == errno.EPIPE:
+                # Remote peer disconnected
+                print "Detected remote disconnect"
+            else:
+                # Determine and handle different error
+                pass
+        else:
+            print "Socket error ", e
+        sock.close()
+
+
+def test_chat(ip, port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((ip, port))
+    try:
+        message = utils.create_join_chat_room_message("cats", "charlie")
+        sock.sendall(message)
+        response = sock.recv(BUFFER_SIZE)
+        sys.stdout.write(response + "\n")
+        while True:
+            sleep(randint(1, 5))
+            sock.sendall(
+                utils.create_leave_chat_room_message(
+                    "cats", randint(1, 100), "charlie"
+                )
+            )
+            response = sock.recv(BUFFER_SIZE)
+            sys.stdout.write(response + "\n")
+    except socket.error, e:
+        if isinstance(e.args, tuple):
+            print "Error number is %d" % e[0]
+            if e[0] == errno.EPIPE:
+                # Remote peer disconnected
+                print "Detected remote disconnect"
+            else:
+                # Determine and handle different error
+                pass
+        else:
+            print "Socket error ", e
         sock.close()
 
 
 def main():
     threads = []
 
-    # Create client, 'bill'
-    room = "programming"
-    client = "bill123"
-    message = utils.create_join_chat_room_message(room, client)
-    sys.stdout.write(message)
+    # Full test scenario
     t = threading.Thread(
-            target=client_worker,
-            args=(HOST, PORT_NUMBER, message)
+            target=test_chat,
+            args=(HOST, PORT_NUMBER)
         )
     threads.append(t)
     t.start()
 
-    # Create client, mary
-    room = "programming"
-    client = "mary123"
-    message = utils.create_leave_chat_room_message(room, 0, client)
-    sys.stdout.write(message)
-    t = threading.Thread(
-            target=client_worker,
-            args=(HOST, PORT_NUMBER, message)
-        )
-    threads.append(t)
-    t.start()
-
-    # Create client, jack
-    room = "programming"
-    client = "jack123"
-    message = utils.create_disconnect_chat_room_message(client)
-    sys.stdout.write(message)
-    t = threading.Thread(
-            target=client_worker,
-            args=(HOST, PORT_NUMBER, message)
-        )
-    threads.append(t)
-    t.start()
-
-    # Create client, bobby
-    room = "programming"
-    client = "bobby123"
-    message = "Hello, world!"
-    message = utils.create_message_chat_room_message(room, 0, client, message)
-    sys.stdout.write(message)
-    t = threading.Thread(
-            target=client_worker,
-            args=(HOST, PORT_NUMBER, message)
-        )
-    threads.append(t)
-    t.start()
+    # # Create client, 'bill'
+    # room = "programming"
+    # client = "bill123"
+    # message = utils.create_join_chat_room_message(room, client)
+    # sys.stdout.write(message)
+    # t = threading.Thread(
+    #         target=client_worker,
+    #         args=(HOST, PORT_NUMBER, message)
+    #     )
+    # threads.append(t)
+    # t.start()
+    #
+    # # Create client, mary
+    # room = "programming"
+    # client = "mary123"
+    # message = utils.create_leave_chat_room_message(room, 0, client)
+    # sys.stdout.write(message)
+    # t = threading.Thread(
+    #         target=client_worker,
+    #         args=(HOST, PORT_NUMBER, message)
+    #     )
+    # threads.append(t)
+    # t.start()
+    #
+    # # Create client, jack
+    # room = "programming"
+    # client = "jack123"
+    # message = utils.create_disconnect_chat_room_message(client)
+    # sys.stdout.write(message)
+    # t = threading.Thread(
+    #         target=client_worker,
+    #         args=(HOST, PORT_NUMBER, message)
+    #     )
+    # threads.append(t)
+    # t.start()
+    #
+    # # Create client, bobby
+    # room = "programming"
+    # client = "bobby123"
+    # message = "Hello, world!"
+    # message = utils.create_message_chat_room_message(room, 0, client, message)
+    # sys.stdout.write(message)
+    # t = threading.Thread(
+    #         target=client_worker,
+    #         args=(HOST, PORT_NUMBER, message)
+    #     )
+    # threads.append(t)
+    # t.start()
 
 if __name__ == "__main__":
     main()

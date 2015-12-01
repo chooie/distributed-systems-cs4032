@@ -1,24 +1,32 @@
 from random import randint
 from time import sleep
-import log
+from functools import partial
 import server_worker_utils as utils
 
 
-def server_worker(host, port, server_thread, semaphore):
+def message_handler(host, port, server_thread):
     sleep(randint(0, 3))
 
-    message = server_thread.data
-
     # TODO: parse message
-    utils.process_message(message)
+    message = server_thread.data
+    values = utils.message_to_dict(message)
+    request = server_thread.request
 
-    # log.processed(message)
+    join_chatroom = partial(utils.handle_join_chat_room, values, request)
+    leave_chatroom = partial(utils.handle_leave_chat_room, values, request)
+    disconnect = partial(utils.handle_disconnect, values, request)
+    chat = partial(utils.handle_chat, values, request)
 
-    # TODO: pass real parameters
-    response = "Message received"
+    handlers = {
+        "JOIN_CHATROOM": join_chatroom,
+        "LEAVE_CHATROOM": leave_chatroom,
+        "DISCONNECT": disconnect,
+        "CHAT": chat
+    }
 
-    # Respond to client
-    server_thread.request.sendall(response)
+    message_type = utils.get_message_dict_type(values)
 
-    # Release semaphore
-    semaphore.release()
+    try:
+        handlers[message_type]()
+    except Exception:
+        print "Something went wrong"

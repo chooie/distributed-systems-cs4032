@@ -1,4 +1,3 @@
-from functools import partial
 from collections import OrderedDict
 from ..shared_lib.string import add_newline_at_end_if_missing
 
@@ -59,37 +58,25 @@ def get_message_dict_type(values):
     return values.keys()[0]
 
 
-def handle_join_chat_room(values):
+def handle_join_chat_room(values, request):
     response = create_joined_chat_room_message(values)
 
+    # TODO: join
 
-def handle_leave_chat_room(values):
+    request.sendall(response)
+
+
+def handle_leave_chat_room(values, request):
     response = create_left_chat_room_message(values)
+    request.sendall(response)
 
 
-def handle_disconnect(values):
+def handle_disconnect(values, request):
     client_name = values["CLIENT_NAME"]
 
     # TODO: Disconnect client with 'client_name'
 
 
-def handle_chat(values):
+def handle_chat(values, request):
     response = create_chat_message(values)
-
-
-def process_message(message):
-    values = message_to_dict(message)
-
-    handlers = {
-        "JOIN_CHATROOM": partial(handle_join_chat_room, values),
-        "LEAVE_CHATROOM": partial(handle_leave_chat_room, values),
-        "DISCONNECT": partial(handle_disconnect, values),
-        "CHAT": partial(handle_chat, values)
-    }
-
-    message_type = get_message_dict_type(values)
-
-    try:
-        handlers[message_type]()
-    except Exception:
-        print "Something went wrong"
+    request.sendall(response)
