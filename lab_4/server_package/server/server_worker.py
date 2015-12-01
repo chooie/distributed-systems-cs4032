@@ -1,9 +1,8 @@
-import sys
 from random import randint
 from time import sleep
-import server_worker_utils as utils
 
-STUDENT_NUMBER = 1234567890
+import log
+import server_worker_utils as utils
 
 
 def server_worker(host, port, server_thread, semaphore):
@@ -11,7 +10,10 @@ def server_worker(host, port, server_thread, semaphore):
 
     message = server_thread.data
 
-    sys.stdout.write(message)
+    # TODO: parse message
+    utils.process_message(message)
+
+    log.processed(message)
 
     # TODO: pass real parameters
     response = utils.create_joined_chat_room_message("room", "id", 0)

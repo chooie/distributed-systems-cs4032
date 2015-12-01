@@ -1,4 +1,5 @@
 import sys
+import log
 
 
 def is_kill_command(data):
@@ -11,17 +12,13 @@ def kill_server():
 
 
 def clean_up_server(server):
+    sys.stdout.write("Server shutting down...")
     server.shutdown()
     server.server_close()
     sys.exit()
 
 
 def refuse_connection(thread):
-    refusal_str = "Refused:\n{0}"
-
-    if thread.data[-2:] != "\n":
-        refusal_str += "\n"
-
-    sys.stdout.write(refusal_str.format(thread.data))
+    log.refused(thread.data)
     thread.request.send("Connection Refused\n")
     thread.request.close()

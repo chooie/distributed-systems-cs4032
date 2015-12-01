@@ -1,6 +1,7 @@
-import sys
-import threading
 import SocketServer
+import threading
+
+import log
 import server_utils as utils
 from server_worker import server_worker
 
@@ -16,6 +17,7 @@ semaphore = threading.BoundedSemaphore(MAX_NUMBER_OF_CLIENTS)
 
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     def __init__(self, client_address, request, server):
+        # Not set until it is read from client
         self.data = None
         SocketServer.BaseRequestHandler.\
             __init__(self, client_address, request, server)
@@ -25,12 +27,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(BUFFER_SIZE)
 
-        processing_str = "Processing Request:\n{0}"
-
-        if self.data[-2:] != "\n":
-            processing_str += "\n"
-
-        sys.stdout.write(processing_str.format(self.data))
+        log.processing(self.data)
 
         if utils.is_kill_command(self.data):
             utils.kill_server()
@@ -40,7 +37,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             utils.refuse_connection(self)
             return
 
-        # Do Work
+        # Do work
         server_worker(HOST, PORT, self, semaphore)
 
 
@@ -50,12 +47,11 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
 
 
-def main():
+def run():
     server = None
 
     try:
         server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler)
-        ip, port = server.server_address
 
         # Start a thread with the server -- that thread will then start one
         # more thread for each request
@@ -63,12 +59,13 @@ def main():
         # Exit the server thread when the main thread terminates
         server_thread.daemon = True
         server_thread.start()
-        print "Server loop running in thread:", server_thread.name
+        log.server_start(server_thread)
+
         while True:
-            # loop forever
+            # Loop until server shut down
             pass
     except (KeyboardInterrupt, SystemExit):
         utils.clean_up_server(server)
 
 if __name__ == "__main__":
-    main()
+    run()
