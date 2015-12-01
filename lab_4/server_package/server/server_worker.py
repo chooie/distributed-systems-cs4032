@@ -1,6 +1,5 @@
 from random import randint
 from time import sleep
-
 import log
 import server_worker_utils as utils
 

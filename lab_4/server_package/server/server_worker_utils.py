@@ -1,5 +1,6 @@
 from functools import partial
 from collections import OrderedDict
+from ..shared_lib.string import add_newline_at_end_if_missing
 
 
 def create_joined_chat_room_message(values):
@@ -15,6 +16,35 @@ def create_joined_chat_room_message(values):
             "ROOM_REF: {1}\n"
             "JOIN_ID: {2}\n"
         ).format(chat_room_name, chat_room_id, client_id)
+
+
+def create_left_chat_room_message(values):
+    chat_room_id = values["LEAVE_CHATROOM"]
+    client_id = values["JOIN_ID"]
+    return (
+        "LEFT_CHATROOM: {0}\n"
+        "JOIN_ID: {1}\n"
+    ).format(chat_room_id, client_id)
+
+
+def create_disconnected_message(values):
+    client_name = values["CLIENT_NAME"]
+    return (
+        "DISCONNECT: 0\n"
+        "PORT: 0\n"
+        "CLIENT_NAME: {0}\n"
+    ).format(client_name)
+
+
+def create_chat_message(values):
+    chat_room_id = values["CHAT"]
+    client_name = values["CLIENT_NAME"]
+    message = add_newline_at_end_if_missing(values["MESSAGE"])
+    return (
+        "CHAT: {0}\n"
+        "CLIENT_NAME: {1}\n"
+        "MESSAGE: {2}\n"
+    ).format(chat_room_id, client_name, message)
 
 
 def message_to_dict(message):
@@ -35,12 +65,7 @@ def message_to_dict(message):
 
 
 def get_message_dict_type(values):
-    print values.keys()
     return values.keys()[0]
-
-
-def do_nothing():
-    return "DEFAULT"
 
 
 def create_response_message_from_type(message):
@@ -48,9 +73,9 @@ def create_response_message_from_type(message):
 
     ops = {
         "JOIN_CHATROOM": partial(create_joined_chat_room_message, values),
-        "LEAVE_CHATROOM": partial(do_nothing),
-        "DISCONNECT": partial(do_nothing),
-        "CHAT": partial(do_nothing)
+        "LEAVE_CHATROOM": partial(create_left_chat_room_message, values),
+        "DISCONNECT": partial(create_disconnected_message, values),
+        "CHAT": partial(create_chat_message, values)
     }
 
     message_type = get_message_dict_type(values)
