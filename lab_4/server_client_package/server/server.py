@@ -41,7 +41,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                     utils.kill_server()
 
                 # Do work
-                message_handler(HOST, PORT, self)
+                message_handler(self)
                 handled = True
         except socket.error, e:
             handle_socket_exception(e, self.request)

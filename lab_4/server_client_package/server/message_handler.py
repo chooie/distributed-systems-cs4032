@@ -5,11 +5,10 @@ import message_handler_utils as utils
 from ..shared_lib.error import MessageHandlerError
 
 
-def message_handler(host, port, server_thread):
+def message_handler(server_thread):
     sleep(randint(0, 3))
 
     try:
-        # TODO: parse message
         message = server_thread.data
         values = utils.message_to_dict(message)
         request = server_thread.request
