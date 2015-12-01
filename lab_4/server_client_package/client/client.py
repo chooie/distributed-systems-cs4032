@@ -1,8 +1,8 @@
 import sys
 from random import randint
 from time import sleep
-import errno
 import socket
+from ..shared_lib.error import handle_socket_exception
 import threading
 import client_utils as utils
 
@@ -22,17 +22,7 @@ def client_worker(ip, port, message):
         response = sock.recv(BUFFER_SIZE)
         sys.stdout.write(response + "\n")
     except socket.error, e:
-        if isinstance(e.args, tuple):
-            print "Error number is is %d" % e[0]
-            if e[0] == errno.EPIPE:
-                # Remote peer disconnected
-                print "Detected remote disconnect"
-            else:
-                # Determine and handle different error
-                pass
-        else:
-            print "Socket error ", e
-        sock.close()
+        handle_socket_exception(e, sock)
 
 
 def test_chat(ip, port):
@@ -53,20 +43,10 @@ def test_chat(ip, port):
             response = sock.recv(BUFFER_SIZE)
             sys.stdout.write(response + "\n")
     except socket.error, e:
-        if isinstance(e.args, tuple):
-            print "Error number is %d" % e[0]
-            if e[0] == errno.EPIPE:
-                # Remote peer disconnected
-                print "Detected remote disconnect"
-            else:
-                # Determine and handle different error
-                pass
-        else:
-            print "Socket error ", e
-        sock.close()
+        handle_socket_exception(e, sock)
 
 
-def main():
+def run():
     threads = []
 
     # Full test scenario
@@ -127,4 +107,4 @@ def main():
     # t.start()
 
 if __name__ == "__main__":
-    main()
+    run()

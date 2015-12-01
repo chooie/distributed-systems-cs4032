@@ -2,8 +2,10 @@ import SocketServer
 import threading
 import sys
 import log
+import socket
 import server_utils as utils
-from server_worker import message_handler
+from message_handler import message_handler
+from ..shared_lib.error import handle_socket_exception
 
 BUFFER_SIZE = 1024
 HOST = "0.0.0.0"
@@ -23,13 +25,15 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             __init__(self, client_address, request, server)
 
     def handle(self):
+        semaphore = ThreadedTCPRequestHandler.semaphore
         handled = False
         try:
-            semaphore = ThreadedTCPRequestHandler.semaphore
-
             while True:
                 # self.request is the TCP socket connected to the client
                 self.data = self.request.recv(BUFFER_SIZE)
+
+                if not self.data:
+                    break
 
                 # Attempt to acquire semaphore
                 if not handled and not semaphore.acquire(DO_NOT_BLOCK):
@@ -41,12 +45,15 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
                 # Do work
                 message_handler(HOST, PORT, self)
+                handled = True
+        except socket.error, e:
+            handle_socket_exception(e, self.request)
         except:
+            print "Unexpected error:", sys.exc_info()[0]
+        finally:
             # TODO Release semaphore on thread destruction
             # Release semaphore
-            # semaphore.release()
-            print "Unexpected error:", sys.exc_info()[0]
-            raise
+            semaphore.release()
 
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
