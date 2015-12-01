@@ -51,8 +51,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             print "Unexpected error:", sys.exc_info
             raise
         finally:
-            # TODO Release semaphore on thread destruction
-            # Release semaphore
+            # Release semaphore on thread destruction
             semaphore.release()
 
 
