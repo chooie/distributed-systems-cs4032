@@ -27,15 +27,6 @@ def create_left_chat_room_message(values):
     ).format(chat_room_id, client_id)
 
 
-def create_disconnected_message(values):
-    client_name = values["CLIENT_NAME"]
-    return (
-        "DISCONNECT: 0\n"
-        "PORT: 0\n"
-        "CLIENT_NAME: {0}\n"
-    ).format(client_name)
-
-
 def create_chat_message(values):
     chat_room_id = values["CHAT"]
     client_name = values["CLIENT_NAME"]
@@ -68,22 +59,37 @@ def get_message_dict_type(values):
     return values.keys()[0]
 
 
-def create_response_message_from_type(message):
+def handle_join_chat_room(values):
+    response = create_joined_chat_room_message(values)
+
+
+def handle_leave_chat_room(values):
+    response = create_left_chat_room_message(values)
+
+
+def handle_disconnect(values):
+    client_name = values["CLIENT_NAME"]
+
+    # TODO: Disconnect client with 'client_name'
+
+
+def handle_chat(values):
+    response = create_chat_message(values)
+
+
+def process_message(message):
     values = message_to_dict(message)
 
-    ops = {
-        "JOIN_CHATROOM": partial(create_joined_chat_room_message, values),
-        "LEAVE_CHATROOM": partial(create_left_chat_room_message, values),
-        "DISCONNECT": partial(create_disconnected_message, values),
-        "CHAT": partial(create_chat_message, values)
+    handlers = {
+        "JOIN_CHATROOM": partial(handle_join_chat_room, values),
+        "LEAVE_CHATROOM": partial(handle_leave_chat_room, values),
+        "DISCONNECT": partial(handle_disconnect, values),
+        "CHAT": partial(handle_chat, values)
     }
 
     message_type = get_message_dict_type(values)
 
-    response = ops[message_type]()
-
-    print response
-
-
-def process_message(message):
-    response = create_response_message_from_type(message)
+    try:
+        handlers[message_type]()
+    except Exception:
+        print "Something went wrong"
