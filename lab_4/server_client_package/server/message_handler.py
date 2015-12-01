@@ -2,6 +2,7 @@ from random import randint
 from time import sleep
 from functools import partial
 import message_handler_utils as utils
+from ..shared_lib.error import MessageHandlerError
 
 
 def message_handler(host, port, server_thread):
@@ -29,5 +30,4 @@ def message_handler(host, port, server_thread):
 
         handlers[message_type]()
     except:
-        print "Exception in message handler"
-        raise
+        raise MessageHandlerError("Error in Message Handler")

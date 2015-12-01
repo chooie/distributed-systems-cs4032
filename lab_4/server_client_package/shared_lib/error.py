@@ -9,7 +9,28 @@ def handle_socket_exception(error, socket):
             print "Detected remote disconnect"
         else:
             # Determine and handle different error
+            print "An error occurred with a socket"
             pass
     else:
         print "Socket error ", error
     socket.close()
+
+
+class MessageHandlerError(Exception):
+    def __init__(self, message):
+
+        # Call the base class constructor with the parameters it needs
+        super(MessageHandlerError, self).__init__(message)
+
+    @staticmethod
+    def get_error_message():
+        return create_error_message(
+            0, "There was an error handling your message"
+        )
+
+
+def create_error_message(error_number, error_description):
+    return (
+        "ERROR_CODE: {0}\n"
+        "ERROR_DESCRIPTION: {1}\n"
+    ).format(error_number, error_description)

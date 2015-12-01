@@ -5,7 +5,7 @@ import log
 import socket
 import server_utils as utils
 from message_handler import message_handler
-from ..shared_lib.error import handle_socket_exception
+from ..shared_lib.error import handle_socket_exception, MessageHandlerError
 
 BUFFER_SIZE = 1024
 HOST = "0.0.0.0"
@@ -32,9 +32,6 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                 # self.request is the TCP socket connected to the client
                 self.data = self.request.recv(BUFFER_SIZE)
 
-                if not self.data:
-                    break
-
                 # Attempt to acquire semaphore
                 if not handled and not semaphore.acquire(DO_NOT_BLOCK):
                     utils.refuse_connection(self)
@@ -48,6 +45,8 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                 handled = True
         except socket.error, e:
             handle_socket_exception(e, self.request)
+        except MessageHandlerError:
+            self.request.sendall(MessageHandlerError.get_error_message())
         except:
             print "Unexpected error:", sys.exc_info()[0]
         finally:
