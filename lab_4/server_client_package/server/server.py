@@ -48,7 +48,8 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         except MessageHandlerError:
             self.request.sendall(MessageHandlerError.get_error_message())
         except:
-            print "Unexpected error:", sys.exc_info()[0]
+            print "Unexpected error:", sys.exc_info
+            raise
         finally:
             # TODO Release semaphore on thread destruction
             # Release semaphore
