@@ -1,4 +1,4 @@
-from ..shared_lib.error import DuplicateClientError
+from server_client_package.shared_lib.error import DuplicateClientError
 from threading import Lock
 
 

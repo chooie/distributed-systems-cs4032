@@ -1,5 +1,5 @@
 import sys
-import log
+import server_client_package.server.log
 
 
 def is_kill_command(data):
@@ -32,6 +32,6 @@ def clean_up_server(server):
 
 
 def refuse_connection(thread):
-    log.refused(thread.data)
+    server_client_package.server.log.refused(thread.data)
     thread.request.send("Connection Refused\n")
     thread.request.close()

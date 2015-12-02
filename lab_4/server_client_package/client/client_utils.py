@@ -1,3 +1,25 @@
+import sys
+import socket
+from random import randint
+from time import sleep
+from server_client_package.shared_lib.constants import BUFFER_SIZE
+from server_client_package.shared_lib.error import handle_socket_exception
+
+
+def execute_scenario(ip, port, message_f):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((ip, port))
+    message = message_f()
+    try:
+        sleep(randint(1, 5))
+        sock.sendall(message)
+        response = sock.recv(BUFFER_SIZE)
+        sys.stdout.write(response + "\n")
+        sock.close()
+    except socket.error, e:
+        handle_socket_exception(e, sock)
+
+
 def create_join_chat_room_message(chat_room_name, client_name):
     return (
         "JOIN_CHATROOM: {0}\n"
@@ -15,7 +37,7 @@ def create_leave_chat_room_message(chat_room_name, join_id, client_name):
     ).format(chat_room_name, join_id, client_name)
 
 
-def create_disconnect_chat_room_message(client_name):
+def create_disconnect_message(client_name):
     return (
         "DISCONNECT: 0\n"
         "PORT: 0\n"

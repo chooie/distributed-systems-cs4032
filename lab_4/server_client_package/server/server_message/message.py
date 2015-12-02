@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from ..shared_lib.string import add_newline_at_end_if_missing
+from server_client_package.shared_lib.string import \
+    add_newline_at_end_if_missing
 
 
 def create_joined_chat_room_message(values):
@@ -56,29 +57,3 @@ def message_to_dict(message):
 
 def get_message_dict_type(values):
     return values.keys()[0]
-
-
-def handle_join_chat_room(values, request):
-    response = create_joined_chat_room_message(values)
-
-    # TODO: join
-
-    request.sendall(response)
-
-
-def handle_leave_chat_room(values, request):
-    response = create_left_chat_room_message(values)
-
-    # TODO: Leave chat room
-    request.sendall(response)
-
-
-def handle_disconnect(values, request):
-    client_name = values["CLIENT_NAME"]
-
-    # TODO: Disconnect client with 'client_name'
-
-
-def handle_chat(values, request):
-    response = create_chat_message(values)
-    request.sendall(response)

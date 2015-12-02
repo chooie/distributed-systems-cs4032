@@ -1,8 +1,11 @@
+import server_client_package.server.server_message.message_handler_utils as \
+    utils
+
+from functools import partial
 from random import randint
 from time import sleep
-from functools import partial
-import message_handler_utils as utils
-from ..shared_lib.error import MessageHandlerError
+from server_client_package.shared_lib.error import MessageHandlerError
+from message import message_to_dict, get_message_dict_type
 
 
 def message_handler(server_thread):
@@ -10,7 +13,7 @@ def message_handler(server_thread):
 
     try:
         message = server_thread.data
-        values = utils.message_to_dict(message)
+        values = message_to_dict(message)
         request = server_thread.request
 
         join_chatroom = partial(utils.handle_join_chat_room, values, request)
@@ -25,7 +28,7 @@ def message_handler(server_thread):
             "CHAT": chat
         }
 
-        message_type = utils.get_message_dict_type(values)
+        message_type = get_message_dict_type(values)
 
         handlers[message_type]()
     except:
