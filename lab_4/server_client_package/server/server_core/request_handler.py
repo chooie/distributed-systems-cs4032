@@ -4,11 +4,12 @@ import sys
 import threading
 
 from server_client_package.server.server_core import server_utils as utils
-from server_client_package.server.server_message.message_handler import message_handler
+from server_client_package.server.server_message.message_handler import \
+    message_handler
 from server_client_package.shared_lib.constants import MAX_NUMBER_OF_CLIENTS, \
     BUFFER_SIZE, DO_NOT_BLOCK, STUDENT_ID
 from server_client_package.shared_lib.error import handle_socket_exception, \
-    MessageHandlerError
+    InformClientError
 
 
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
@@ -47,8 +48,8 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                 handled = True
         except socket.error, e:
             handle_socket_exception(e, self.request)
-        except MessageHandlerError:
-            self.request.sendall(MessageHandlerError.get_error_message())
+        except InformClientError, e:
+            self.request.sendall(e.get_error_message())
         except:
             print "Unexpected error:", sys.exc_info
             raise

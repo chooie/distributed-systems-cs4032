@@ -32,4 +32,4 @@ def message_handler(server_thread):
 
         handlers[message_type]()
     except:
-        raise MessageHandlerError("Error in Message Handler")
+        raise MessageHandlerError()

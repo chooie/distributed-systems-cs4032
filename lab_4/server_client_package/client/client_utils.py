@@ -20,6 +20,10 @@ def execute_scenario(ip, port, message_f):
         handle_socket_exception(e, sock)
 
 
+def create_helo_message():
+    return "HELO text\n"
+
+
 def create_join_chat_room_message(chat_room_name, client_name):
     return (
         "JOIN_CHATROOM: {0}\n"
