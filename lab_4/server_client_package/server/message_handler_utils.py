@@ -68,6 +68,8 @@ def handle_join_chat_room(values, request):
 
 def handle_leave_chat_room(values, request):
     response = create_left_chat_room_message(values)
+
+    # TODO: Leave chat room
     request.sendall(response)
 
 

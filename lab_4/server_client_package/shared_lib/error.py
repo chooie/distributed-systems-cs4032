@@ -1,5 +1,8 @@
 import errno
 
+MESSAGE_HANDLER_ERROR = 0
+DUPLICATE_CLIENT_ERROR = 1
+
 
 def handle_socket_exception(error, socket):
     if isinstance(error.args, tuple):
@@ -25,7 +28,20 @@ class MessageHandlerError(Exception):
     @staticmethod
     def get_error_message():
         return create_error_message(
-            0, "There was an error handling your message"
+            MESSAGE_HANDLER_ERROR, "There was an error handling your message"
+        )
+
+
+class DuplicateClientError(Exception):
+    def __init__(self, message):
+
+        # Call the base class constructor with the parameters it needs
+        super(DuplicateClientError, self).__init__(message)
+
+    @staticmethod
+    def get_error_message():
+        return create_error_message(
+            DUPLICATE_CLIENT_ERROR, "There is already a user with that name"
         )
 
 
