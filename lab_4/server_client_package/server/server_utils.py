@@ -11,6 +11,19 @@ def kill_server():
     sys.exit()
 
 
+def begins_with_helo_text(data):
+    return data[:4] == "HELO"
+
+
+def handle_helo_message(ip, port, student_id, server_thread):
+    info = (
+            "IP:{0}\n"
+            "Port:{1}\n"
+            "StudentID:{2}\n"
+        ).format(ip, port, student_id)
+    server_thread.request.sendall(server_thread.data + info)
+
+
 def clean_up_server(server):
     sys.stdout.write("Server shutting down...")
     server.shutdown()

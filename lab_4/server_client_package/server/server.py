@@ -13,6 +13,8 @@ PORT = 8080
 MAX_NUMBER_OF_CLIENTS = 10
 DO_NOT_BLOCK = False
 
+STUDENT_ID = 1234567890
+
 
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     # If semaphore blocks, client's connection will be refused
@@ -26,7 +28,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
         semaphore = ThreadedTCPRequestHandler.semaphore
-        handled = False
+        handled = False  # Only acquire semaphore on first iteration
         try:
             while True:
                 # self.request is the TCP socket connected to the client
@@ -39,6 +41,10 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
                 if utils.is_kill_command(self.data):
                     utils.kill_server()
+
+                if utils.begins_with_helo_text(self.data):
+                    utils.handle_helo_message(HOST, PORT, STUDENT_ID, self)
+                    continue
 
                 # Do work
                 message_handler(self)

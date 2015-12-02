@@ -1,6 +1,7 @@
 import sys
 from random import randint
 from time import sleep
+import errno
 import socket
 from ..shared_lib.error import handle_socket_exception
 import threading
@@ -9,7 +10,6 @@ import client_utils as utils
 BUFFER_SIZE = 1024
 HOST = "0.0.0.0"
 PORT_NUMBER = 8080
-
 NUMBER_OF_CLIENTS = 20
 
 
@@ -21,6 +21,7 @@ def client_worker(ip, port, message):
         sock.sendall(message)
         response = sock.recv(BUFFER_SIZE)
         sys.stdout.write(response + "\n")
+        sock.close()
     except socket.error, e:
         handle_socket_exception(e, sock)
 
@@ -53,6 +54,13 @@ def run():
     t = threading.Thread(
             target=test_chat,
             args=(HOST, PORT_NUMBER)
+        )
+    threads.append(t)
+    t.start()
+
+    t = threading.Thread(
+            target=client_worker,
+            args=(HOST, PORT_NUMBER, "HELO text\n")
         )
     threads.append(t)
     t.start()
