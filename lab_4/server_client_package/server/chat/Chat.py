@@ -23,9 +23,6 @@ class Chat:
         safe(self.active_clients_lock, partial(f))
 
     def remove_active_client(self, client_name, client_id):
-        self.active_clients_lock.acquire()
-        self.chat_rooms_lock.acquire()
-
         def f():
             # Remove from active_clients and chat_rooms
             self.active_clients.pop(client_name)
