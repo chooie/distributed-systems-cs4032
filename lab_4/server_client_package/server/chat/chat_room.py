@@ -1,5 +1,7 @@
-from server_client_package.shared_lib.error import DuplicateChatClientError
 from threading import Lock
+from functools import partial
+from server_client_package.shared_lib.error import DuplicateChatClientError
+from server_client_package.shared_lib.utils import safe
 
 
 class ChatRoom:
@@ -11,17 +13,14 @@ class ChatRoom:
         self.members = {}
 
     def remove_member(self, client_name, client_id):
-        self.lock.acquire()
-        # Don't care whether or not anything was returned
-        self.members.pop(client_name, None)
-        self.lock.release()
+        def f():
+            self.members.pop(client_name, None)
+
+        safe(self.lock, partial(f))
 
     def add_member(self, client_name, client_id):
-        self.lock.acquire()
-
-        if self.members.get(client_name):
-            raise DuplicateChatClientError()
-
-        self.members[client_name] = None
-        self.lock.release()
-
+        def f():
+            if self.members.get(client_name):
+                raise DuplicateChatClientError()
+            self.members[client_name] = None
+        safe(self.lock, partial(f))

@@ -1,5 +1,7 @@
-from server_client_package.shared_lib.error import DuplicateClientError
 from threading import Lock
+from functools import partial
+from server_client_package.shared_lib.error import DuplicateClientError
+from server_client_package.shared_lib.utils import safe
 
 
 class Chat:
@@ -10,26 +12,29 @@ class Chat:
         self.chat_rooms_lock = Lock()
 
     def add_active_client(self, client_name, client_id, thread_handle):
-        self.active_clients_lock.acquire()
+        def f():
+            # Check client isn't already in dict
+            if self.active_clients.get(self, client_name):
+                raise DuplicateClientError(client_name)
 
-        # Check client isn't already in dict
-        if self.active_clients.get(self, client_name):
-            raise DuplicateClientError(client_name)
+            # Add client
+            self.active_clients[client_name] = thread_handle
 
-        # Add client
-        self.active_clients[client_name] = thread_handle
-        self.active_clients_lock.release()
+        safe(self.active_clients_lock, partial(f))
 
     def remove_active_client(self, client_name, client_id):
         self.active_clients_lock.acquire()
         self.chat_rooms_lock.acquire()
 
-        # Remove from active_clients and chat_rooms
-        self.active_clients.pop(client_name)
+        def f():
+            # Remove from active_clients and chat_rooms
+            self.active_clients.pop(client_name)
 
-        # TODO: Loop through chat rooms and remove client
-        for chat_room in self.chat_rooms:
-            chat_room.remove_member(client_name, client_id)
+            # Loop through chat rooms and remove client
+            for chat_room in self.chat_rooms:
+                chat_room.remove_member(client_name, client_id)
 
-        self.active_clients_lock.release()
-        self.chat_rooms_lock.release()
+        def g():
+            safe(self.chat_rooms_lock, partial(f))
+
+        safe(self.active_clients_lock, partial(g))
