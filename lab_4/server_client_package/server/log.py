@@ -17,6 +17,10 @@ def processing(message):
     write_message("Processing:", message)
 
 
+def error_processing(message):
+    write_message("ERROR - Processing:", message)
+
+
 def processed(message):
     write_message("Processed:", message)
 

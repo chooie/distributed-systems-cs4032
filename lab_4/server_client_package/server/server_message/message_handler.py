@@ -1,18 +1,17 @@
+import logging
 import server_client_package.server.server_message.message_handler_utils as \
     utils
 
 from functools import partial
-from random import randint
-from time import sleep
 from server_client_package.shared_lib.error import MessageHandlerError
+from server_client_package.server.server_core.server_utils import \
+    TerminateRequestThread
 from message import message_to_dict, get_message_dict_type
 
 
 def message_handler(server_thread):
-    sleep(randint(0, 3))
-
+    message = server_thread.data
     try:
-        message = server_thread.data
         values = message_to_dict(message)
         request = server_thread.request
 
@@ -31,5 +30,8 @@ def message_handler(server_thread):
         message_type = get_message_dict_type(values)
 
         handlers[message_type]()
-    except:
-        raise MessageHandlerError()
+    except TerminateRequestThread:
+        raise TerminateRequestThread
+    except Exception, e:
+        logging.exception(e)
+        raise MessageHandlerError(message)

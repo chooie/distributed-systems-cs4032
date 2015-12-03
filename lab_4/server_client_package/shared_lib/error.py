@@ -38,10 +38,11 @@ class InformClientError(Exception):
 
 
 class MessageHandlerError(InformClientError):
-    def __init__(self):
+    def __init__(self, original_message):
         super(MessageHandlerError, self).__init__(
              MESSAGE_HANDLER_ERROR, "There was an error handling your message"
         )
+        self.original_message = original_message
 
 
 class DuplicateClientError(InformClientError):

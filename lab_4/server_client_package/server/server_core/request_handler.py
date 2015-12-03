@@ -1,15 +1,15 @@
 import SocketServer
 import socket
-import sys
 import threading
 
-from server_client_package.server.server_core import server_utils as utils
+from server_client_package.server.server_core.server_utils import *
 from server_client_package.server.server_message.message_handler import \
     message_handler
 from server_client_package.shared_lib.constants import MAX_NUMBER_OF_CLIENTS, \
     BUFFER_SIZE, DO_NOT_BLOCK, STUDENT_ID
 from server_client_package.shared_lib.error import handle_socket_exception, \
-    InformClientError
+    InformClientError, MessageHandlerError
+from server_client_package.server.log import error_processing
 
 
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
@@ -30,17 +30,20 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                 # self.request is the TCP socket connected to the client
                 self.data = self.request.recv(BUFFER_SIZE)
 
+                if not self.data:
+                    break
+
                 # Attempt to acquire semaphore
                 if not handled and not semaphore.acquire(DO_NOT_BLOCK):
-                    utils.refuse_connection(self)
+                    refuse_connection(self)
                     return
 
-                if utils.is_kill_command(self.data):
-                    utils.kill_server()
+                if is_kill_command(self.data):
+                    kill_server()
 
-                if utils.begins_with_helo_text(self.data):
+                if begins_with_helo_text(self.data):
                     (host, port) = self.server.server_address
-                    utils.handle_helo_message(host, port, STUDENT_ID, self)
+                    handle_helo_message(host, port, STUDENT_ID, self)
                     continue
 
                 # Do work
@@ -48,12 +51,18 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                 handled = True
         except socket.error, e:
             handle_socket_exception(e, self.request)
+        except MessageHandlerError, e:
+            error_processing(e.original_message)
+            self.request.sendall(e.get_error_message())
         except InformClientError, e:
             self.request.sendall(e.get_error_message())
+        except TerminateRequestThread:
+            pass
         except:
             print "Unexpected error:", sys.exc_info
             raise
         finally:
+            print "Client disconnected"
             # Release semaphore on thread destruction
             semaphore.release()
 

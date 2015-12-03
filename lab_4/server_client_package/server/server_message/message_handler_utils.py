@@ -1,6 +1,8 @@
 from server_client_package.server.server_message.message import \
     create_joined_chat_room_message, create_left_chat_room_message, \
     create_chat_message
+from server_client_package.server.server_core.server_utils import \
+    TerminateRequestThread
 
 
 def handle_join_chat_room(values, request):
@@ -22,6 +24,7 @@ def handle_disconnect(values, request):
     client_name = values["CLIENT_NAME"]
 
     # TODO: Disconnect client with 'client_name'
+    raise TerminateRequestThread()
 
 
 def handle_chat(values, request):

@@ -35,3 +35,7 @@ def refuse_connection(thread):
     server_client_package.server.log.refused(thread.data)
     thread.request.send("Connection Refused\n")
     thread.request.close()
+
+
+class TerminateRequestThread(Exception):
+    pass
