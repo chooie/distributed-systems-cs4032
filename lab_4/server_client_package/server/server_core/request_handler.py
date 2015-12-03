@@ -1,3 +1,4 @@
+import sys
 import SocketServer
 import socket
 import threading
@@ -62,9 +63,10 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             print "Unexpected error:", sys.exc_info
             raise
         finally:
-            print "Client disconnected"
+            sys.stdout.write("Client disconnected\n")
             # Release semaphore on thread destruction
-            semaphore.release()
+            if handled:
+                semaphore.release()
 
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
