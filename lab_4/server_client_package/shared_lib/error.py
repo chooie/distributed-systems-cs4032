@@ -3,6 +3,8 @@ import errno
 MESSAGE_HANDLER_ERROR = 0
 DUPLICATE_CLIENT_ERROR = 1
 DUPLICATE_CHAT_CLIENT_ERROR = 2
+DUPLICATE_CHAT_ROOM_ERROR = 3
+NON_EXISTANT_CHAT_ROOM_ERROR = 4
 
 
 def handle_socket_exception(error, socket):
@@ -61,4 +63,20 @@ class DuplicateChatClientError(InformClientError):
         super(DuplicateChatClientError, self).__init__(
             DUPLICATE_CHAT_CLIENT_ERROR,
             "This chat room already has a member by that name"
+        )
+
+
+class DuplicateChatRoomError(InformClientError):
+    def __init__(self):
+        super(DuplicateChatRoomError, self).__init__(
+            DUPLICATE_CHAT_ROOM_ERROR,
+            "This chat room already exists"
+        )
+
+
+class NonExistantChatRoomError(InformClientError):
+    def __init__(self):
+        super(NonExistantChatRoomError, self).__init__(
+            NON_EXISTANT_CHAT_ROOM_ERROR,
+            "This chat room doesn't exist"
         )
