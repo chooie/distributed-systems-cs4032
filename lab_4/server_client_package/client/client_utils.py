@@ -24,6 +24,10 @@ def create_helo_message():
     return "HELO text\n"
 
 
+def create_bad_message():
+    return "This is a bad message"
+
+
 def create_join_chat_room_message(chat_room_name, client_name):
     return (
         "JOIN_CHATROOM: {0}\n"

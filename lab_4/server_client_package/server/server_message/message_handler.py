@@ -1,4 +1,3 @@
-import logging
 import server_client_package.server.server_message.message_handler_utils as \
     utils
 
@@ -32,6 +31,5 @@ def message_handler(server_thread):
         handlers[message_type]()
     except TerminateRequestThread:
         raise TerminateRequestThread
-    except Exception, e:
-        logging.exception(e)
+    except:
         raise MessageHandlerError(message)

@@ -10,6 +10,11 @@ def helo_scenario(ip, port):
     utils.execute_scenario(ip, port, helo)
 
 
+def bad_message_scenario(ip, port):
+    bad = partial(utils.create_bad_message)
+    utils.execute_scenario(ip, port, bad)
+
+
 def disconnect_scenario(ip, port):
     disconnect = partial(utils.create_disconnect_message, 'bill')
     utils.execute_scenario(ip, port, disconnect)
@@ -28,6 +33,14 @@ def run():
             target=helo_scenario,
             args=(HOST, PORT)
         )
+    threads.append(t)
+    t.start()
+
+    # Bad message scenario
+    t = threading.Thread(
+        target=bad_message_scenario,
+        args=(HOST, PORT)
+    )
     threads.append(t)
     t.start()
 
