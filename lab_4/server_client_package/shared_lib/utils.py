@@ -1,4 +1,5 @@
 def safe(lock, f):
     lock.acquire()
-    f()
+    output = f()
     lock.release()
+    return output

@@ -11,21 +11,25 @@ from server_client_package.shared_lib.constants import MAX_NUMBER_OF_CLIENTS, \
 from server_client_package.shared_lib.error import handle_socket_exception, \
     InformClientError, MessageHandlerError
 from server_client_package.server.log import error_processing
+from server_client_package.server.chat.chat import Chat
 
 
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     # If semaphore blocks, client's connection will be refused
     semaphore = threading.BoundedSemaphore(MAX_NUMBER_OF_CLIENTS)
+    chat = Chat()
 
     def __init__(self, client_address, request, server):
         # Not set until it is read from client
         self.data = None
+        self.chat = ThreadedTCPRequestHandler.chat
         SocketServer.BaseRequestHandler.\
             __init__(self, client_address, request, server)
 
     def handle(self):
         semaphore = ThreadedTCPRequestHandler.semaphore
         handled = False  # Only acquire semaphore on first iteration
+
         try:
             while True:
                 # self.request is the TCP socket connected to the client

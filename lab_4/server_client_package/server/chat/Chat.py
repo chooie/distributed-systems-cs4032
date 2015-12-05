@@ -19,13 +19,15 @@ class Chat:
         self.chat_rooms_lock = Lock()
 
     def add_active_client(self, client_name, client_id, thread_handle):
-        def f():
-            # Check client isn't already in dict
-            if self.active_clients.get(self, client_name):
-                raise DuplicateClientError(client_name)
 
-            # Add client
-            self.active_clients[client_name] = ([], thread_handle)
+        def f():
+            # Add if client isn't already in dict
+            if not self.active_clients.get(client_name):
+                # Add client
+                self.active_clients[client_name] = ([], thread_handle)
+
+            # Do nothing if they're already a member
+            # raise DuplicateClientError(client_name)
 
         safe(self.active_clients_lock, partial(f))
 
@@ -49,14 +51,20 @@ class Chat:
         safe(self.active_clients_lock, partial(g))
 
     def add_chat_room(self, chat_room_name):
-        if self.chat_rooms.get(chat_room_name):
-            raise DuplicateChatRoomError()
-        chat_room = ChatRoom(chat_room_name)
-        self.chat_rooms[chat_room_name] = chat_room
+        def f():
+            chat_room = self.chat_rooms.get(chat_room_name)
+            if not chat_room:
+                chat_room = ChatRoom(chat_room_name)
+                self.chat_rooms[chat_room_name] = chat_room
+            # raise DuplicateChatRoomError()
+            return chat_room
+
+        return safe(self.chat_rooms_lock, partial(f))
 
     def remove_chat_room(self, chat_room_name):
         chat_room = self.chat_rooms.pop(chat_room_name, None)
         if not chat_room:
             raise NonExistantChatRoomError()
 
-
+    def get_chat_room(self, chat_room_name):
+        return self.chat_rooms.get(chat_room_name)
