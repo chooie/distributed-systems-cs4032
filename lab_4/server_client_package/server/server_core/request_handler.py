@@ -10,7 +10,7 @@ from server_client_package.shared_lib.constants import MAX_NUMBER_OF_CLIENTS, \
     BUFFER_SIZE, DO_NOT_BLOCK, STUDENT_ID
 from server_client_package.shared_lib.error import handle_socket_exception, \
     InformClientError, MessageHandlerError
-from server_client_package.server.log import error_processing
+from server_client_package.server.log import error_processing, processing
 from server_client_package.server.chat.chat import Chat
 
 
@@ -38,6 +38,8 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
                 # self.request is the TCP socket connected to the client
                 self.data = self.request.recv(BUFFER_SIZE)
+
+                processing(self.data)
 
                 # Attempt to acquire semaphore
                 if not handled and not semaphore.acquire(DO_NOT_BLOCK):
