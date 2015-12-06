@@ -64,8 +64,10 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             error_processing(e.original_message)
             self.request.sendall(e.get_error_message())
         except InformClientError, e:
+            sys.stdout.write("Informing client of error\n")
             self.request.sendall(e.get_error_message())
         except TerminateRequestThread:
+            sys.stdout.write("Terminate thread\n")
             pass
         except:
             print "Unexpected error:", sys.exc_info
