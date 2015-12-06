@@ -9,18 +9,24 @@ class ChatRoom:
         self.lock = Lock()
         self.chat_room_name = chat_room_name
 
-        # { "foo": None, "bar": None } -- values aren't used.
+        # { "foo": thread_handle, "bar": thread_handle } -- values aren't used.
         self.members = {}
 
     def remove_member(self, client_name, client_id):
         def f():
             self.members.pop(client_name, None)
 
+            # TODO: send remove message to all clients
+
         safe(self.lock, partial(f))
 
-    def add_member(self, client_name, client_id):
+    def add_member(self, client_name, client_id, thread_handle):
         def f():
             if self.members.get(client_name):
                 raise DuplicateChatClientError()
-            self.members[client_name] = None
+            self.members[client_name] = thread_handle
         safe(self.lock, partial(f))
+
+    def send_message_to_all_members(self, message):
+        for member_name in self.members:
+            self.members[member_name].request.sendall(message)

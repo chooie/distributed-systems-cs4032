@@ -44,6 +44,13 @@ def join_and_leave_chat(ip, port):
             response = sock.recv(BUFFER_SIZE)
             sys.stdout.write(response + "\n")
 
+            message = create_message_chat_room_message(
+                chat_room, 0, client_name, "This is a test message."
+            )
+            sock.sendall(message)
+            response = sock.recv(BUFFER_SIZE)
+            sys.stdout.write(response + "\n")
+
             message = create_leave_chat_room_message(chat_room, 0, client_name)
             sock.sendall(message)
             response = sock.recv(BUFFER_SIZE)

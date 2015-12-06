@@ -20,7 +20,7 @@ def handle_join_chat_room(values, server_thread):
 
     chat_room = chat.add_chat_room(chat_room_name)
 
-    chat_room.add_member(client_name, client_id)
+    chat_room.add_member(client_name, client_id, server_thread)
 
     response = create_joined_chat_room_message(values)
 
@@ -54,5 +54,12 @@ def handle_disconnect(values, server_thread):
 
 
 def handle_chat(values, server_thread):
+    chat_room_name = values["CHAT"]
+
     response = create_chat_message(values)
-    server_thread.request.sendall(response)
+
+    chat = server_thread.chat
+
+    chat_room = chat.get_chat_room(chat_room_name)
+
+    chat_room.send_message_to_all_members(response)
