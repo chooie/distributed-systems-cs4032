@@ -42,8 +42,8 @@ def message_to_dict(message):
     message_dict = OrderedDict()
     message_lines = message.split('\n')
 
-    # Remove last newline
-    message_lines = message_lines[:-1]
+    # Remove empty elements
+    message_lines = filter(None, message_lines)
     for message_line in message_lines:
         line_words = message_line.split(':')
         line_words = map(lambda x: x.strip(), line_words)

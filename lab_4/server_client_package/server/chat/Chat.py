@@ -2,10 +2,7 @@ from chat_room import ChatRoom
 
 from threading import Lock
 from functools import partial
-from server_client_package.shared_lib.error import DuplicateClientError,\
-    DuplicateChatRoomError, NonExistantChatRoomError
-from server_client_package.server.server_core.server_utils import \
-    TerminateRequestThread
+from server_client_package.shared_lib.error import NonExistantChatRoomError
 from server_client_package.shared_lib.utils import safe
 
 
@@ -31,19 +28,18 @@ class Chat:
 
         safe(self.active_clients_lock, partial(f))
 
-    def remove_active_client(self, client_name, client_id):
+    def remove_active_client(self, client_name):
         def f():
             # Remove from active_clients
             client = self.active_clients.pop(client_name)
             client_chat_rooms = client[0]
-            # TODO: Figure out if I really need this
             client_thread_handle = client[1]
 
             # Loop through chat rooms and remove client
             for chat_room in client_chat_rooms:
-                chat_room.remove_member(client_name, client_id)
+                chat_room.remove_member(client_name)
 
-            raise TerminateRequestThread()
+            client_thread_handle.terminate_request = True
 
         def g():
             safe(self.chat_rooms_lock, partial(f))

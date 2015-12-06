@@ -23,6 +23,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         # Not set until it is read from client
         self.data = None
         self.chat = ThreadedTCPRequestHandler.chat
+        self.terminate_request = False
         SocketServer.BaseRequestHandler.\
             __init__(self, client_address, request, server)
 
@@ -32,6 +33,9 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
         try:
             while True:
+                if self.terminate_request:
+                    raise TerminateRequestThread
+
                 # self.request is the TCP socket connected to the client
                 self.data = self.request.recv(BUFFER_SIZE)
 

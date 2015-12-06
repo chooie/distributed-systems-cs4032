@@ -98,8 +98,6 @@ def create_disconnect_message(client_name):
 
 def create_message_chat_room_message(chat_room_name, join_id, client_name,
                                      message):
-    # TODO: Add newline to message if not present
-
     return (
         "CHAT: {0}\n"
         "JOIN_ID: {1}\n"
