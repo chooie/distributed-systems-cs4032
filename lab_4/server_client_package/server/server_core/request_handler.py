@@ -39,9 +39,6 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                 # self.request is the TCP socket connected to the client
                 self.data = self.request.recv(BUFFER_SIZE)
 
-                if not self.data:
-                    break
-
                 # Attempt to acquire semaphore
                 if not handled and not semaphore.acquire(DO_NOT_BLOCK):
                     refuse_connection(self)
