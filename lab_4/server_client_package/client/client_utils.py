@@ -26,7 +26,37 @@ def connect(ip, port):
     return sock
 
 
-def join_and_leave_chat(ip, port):
+def bill_scenario(ip, port):
+    sock = connect(ip, port)
+
+    chat_room = "cats"
+    client_name = "bill"
+
+    try:
+        message = create_join_chat_room_message(chat_room, client_name)
+        sock.sendall(message)
+        response = sock.recv(BUFFER_SIZE)
+        sys.stdout.write(response + "\n")
+
+        while True:
+            response = sock.recv(BUFFER_SIZE)
+            sys.stdout.write(response + "\n")
+            break
+
+        message = create_leave_chat_room_message(chat_room, 0, client_name)
+        sock.sendall(message)
+        response = sock.recv(BUFFER_SIZE)
+        sys.stdout.write(response + "\n")
+
+        sleep(randint(0, 2))
+
+        message = create_disconnect_message(client_name)
+        sock.sendall(message)
+    except socket.error, e:
+        handle_socket_exception(e, sock)
+
+
+def charlie_scenario(ip, port):
     sock = connect(ip, port)
 
     chat_room = "cats"
@@ -36,7 +66,6 @@ def join_and_leave_chat(ip, port):
 
     try:
         while True:
-            sleep(randint(1, 5))
             if scenario_executed:
                 break
             message = create_join_chat_room_message(chat_room, client_name)

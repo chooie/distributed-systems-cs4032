@@ -75,9 +75,17 @@ def run():
     # threads.append(t)
     # t.start()
 
-    # Test scenario
+    # Bill scenario
     t = threading.Thread(
-            target=utils.join_and_leave_chat,
+            target=utils.bill_scenario,
+            args=(HOST, PORT)
+        )
+    threads.append(t)
+    t.start()
+
+    # Charlie scenario
+    t = threading.Thread(
+            target=utils.charlie_scenario,
             args=(HOST, PORT)
         )
     threads.append(t)
