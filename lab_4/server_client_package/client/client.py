@@ -2,33 +2,39 @@ import threading
 import client_utils as utils
 
 from functools import partial
+
+from server_client_package.client.message import create_helo_message, \
+    create_bad_message, create_disconnect_message, \
+    create_join_chat_room_message, create_leave_chat_room_message
 from server_client_package.shared_lib.constants import HOST, PORT
 
 
 def helo_scenario(ip, port):
-    helo = partial(utils.create_helo_message)
+    helo = partial(create_helo_message)
     utils.execute_scenario(ip, port, helo)
 
 
 def bad_message_scenario(ip, port):
-    bad = partial(utils.create_bad_message)
+    bad = partial(create_bad_message)
     utils.execute_scenario(ip, port, bad)
 
 
 def disconnect_scenario(ip, port):
-    disconnect = partial(utils.create_disconnect_message, 'bill')
+    disconnect = partial(create_disconnect_message, 'bill')
     utils.execute_scenario(ip, port, disconnect)
 
 
 def join_chat_scenario(ip, port, chat_room_name, client_name):
-    join_chat = partial(utils.create_join_chat_room_message, chat_room_name,
-                        client_name)
+    join_chat = partial(
+        create_join_chat_room_message, chat_room_name, client_name
+    )
     utils.execute_scenario(ip, port, join_chat)
 
 
 def leave_chat_scenario(ip, port, chat_room_name, client_name):
-    leave_chat = partial(utils.create_leave_chat_room_message, chat_room_name,
-                         0, client_name)
+    leave_chat = partial(
+        create_leave_chat_room_message, chat_room_name, 0, client_name
+    )
     utils.execute_scenario(ip, port, leave_chat)
 
 
