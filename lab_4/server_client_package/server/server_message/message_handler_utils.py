@@ -1,3 +1,4 @@
+from server_client_package.server.log import write_message
 from server_client_package.server.server_message.message import \
     create_joined_chat_room_message, create_left_chat_room_message, \
     create_chat_message
@@ -20,6 +21,8 @@ def handle_join_chat_room(values, server_thread):
 
     response = create_joined_chat_room_message(values)
 
+    write_message("Handle join chat message:", response)
+
     server_thread.request.sendall(response)
 
 
@@ -39,6 +42,8 @@ def handle_leave_chat_room(values, server_thread):
 
     response = create_left_chat_room_message(values)
 
+    write_message("Handle leave chat message:", response)
+
     server_thread.request.sendall(response)
 
 
@@ -47,6 +52,8 @@ def handle_disconnect(values, server_thread):
 
     chat = server_thread.chat
 
+    write_message("Handling disconnect...", '')
+
     chat.remove_active_client(client_name)
 
 
@@ -54,6 +61,8 @@ def handle_chat(values, server_thread):
     chat_room_name = values["CHAT"]
 
     response = create_chat_message(values)
+
+    write_message("Handle chat message:", response)
 
     chat = server_thread.chat
 
