@@ -16,7 +16,7 @@ class ChatRoom:
         def f():
             self.members.pop(client_name, None)
 
-            message = "{0} left the room.\n".format(client_name)
+            message = "{0} has left this chatroom.\n".format(client_name)
 
             for member_name in self.members:
                 self.members[member_name].request.sendall(message)
@@ -28,6 +28,12 @@ class ChatRoom:
             if self.members.get(client_name):
                 raise DuplicateChatClientError()
             self.members[client_name] = thread_handle
+
+            message = "{0} has joined this chatroom.\n".format(client_name)
+
+            for member_name in self.members:
+                self.members[member_name].request.sendall(message)
+
         safe(self.lock, partial(f))
 
     def send_message_to_all_members(self, message):
