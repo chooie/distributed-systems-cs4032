@@ -3,7 +3,9 @@ import SocketServer
 import socket
 import threading
 
-from server_client_package.server.server_core.server_utils import *
+from server_client_package.server.server_core.server_utils import \
+    begins_with_helo_text, handle_helo_message, is_kill_command, kill_server, \
+    refuse_connection, TerminateRequestThread
 from server_client_package.server.server_message.message_handler import \
     message_handler
 from server_client_package.shared_lib.constants import MAX_NUMBER_OF_CLIENTS, \
@@ -55,16 +57,17 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                     continue
 
                 # Do work
-                message_handler(self)
-                handled = True
+                try:
+                    message_handler(self)
+                    handled = True
+                except MessageHandlerError, e:
+                    error_processing(e.original_message)
+                    self.request.sendall(e.get_error_message())
+                except InformClientError, e:
+                    sys.stdout.write("Informing client of error\n")
+                    self.request.sendall(e.get_error_message())
         except socket.error, e:
             handle_socket_exception(e, self.request)
-        except MessageHandlerError, e:
-            error_processing(e.original_message)
-            self.request.sendall(e.get_error_message())
-        except InformClientError, e:
-            sys.stdout.write("Informing client of error\n")
-            self.request.sendall(e.get_error_message())
         except TerminateRequestThread:
             sys.stdout.write("Terminate thread\n")
             pass
