@@ -2,6 +2,8 @@ from threading import Lock
 from functools import partial
 from server_client_package.shared_lib.error import DuplicateChatClientError
 from server_client_package.shared_lib.utils import safe
+from server_client_package.server.server_message.message import \
+    create_chat_message
 
 
 class ChatRoom:
@@ -30,6 +32,12 @@ class ChatRoom:
             self.members[client_name] = thread_handle
 
             message = "{0} has joined this chatroom.\n".format(client_name)
+
+            message = (
+                "CHAT:{0}\n"
+                "CLIENT_NAME:{1}\n"
+                "MESSAGE:{2}\n"
+            ).format(12345, client_name, message)
 
             for member_name in self.members:
                 self.members[member_name].request.sendall(message)
