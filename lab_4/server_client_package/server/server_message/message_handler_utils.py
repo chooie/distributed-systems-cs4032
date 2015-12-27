@@ -1,3 +1,4 @@
+from time import sleep
 from server_client_package.server.log import write_message
 from server_client_package.server.server_message.message import \
     create_joined_chat_room_message, create_left_chat_room_message, \
@@ -22,6 +23,8 @@ def handle_join_chat_room(values, server_thread):
     response = create_joined_chat_room_message(values)
 
     write_message("Handle join chat message:", response)
+
+    sleep(1)
 
     server_thread.request.sendall(response)
 
