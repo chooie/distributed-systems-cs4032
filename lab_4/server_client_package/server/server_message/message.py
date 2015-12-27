@@ -11,11 +11,11 @@ def create_joined_chat_room_message(values):
     chat_room_id = "12345"
     client_id = "54321"
     return (
-            "JOINED_CHATROOM: {0}\n"
-            "SERVER_IP: {1}\n"
-            "PORT: {2}\n"
-            "ROOM_REF: {3}\n"
-            "JOIN_ID: {4}\n"
+            "JOINED_CHATROOM:{0}\n"
+            "SERVER_IP:{1}\n"
+            "PORT:{2}\n"
+            "ROOM_REF:{3}\n"
+            "JOIN_ID:{4}\n"
         ).format(chat_room_name, HOST, PORT, chat_room_id, client_id)
 
 
@@ -23,8 +23,8 @@ def create_left_chat_room_message(values):
     chat_room_id = values["LEAVE_CHATROOM"]
     client_id = values["JOIN_ID"]
     return (
-        "LEFT_CHATROOM: {0}\n"
-        "JOIN_ID: {1}\n"
+        "LEFT_CHATROOM:{0}\n"
+        "JOIN_ID:{1}\n"
     ).format(chat_room_id, client_id)
 
 
@@ -33,9 +33,9 @@ def create_chat_message(values):
     client_name = values["CLIENT_NAME"]
     message = add_newline_at_end_if_missing(values["MESSAGE"])
     return (
-        "CHAT: {0}\n"
-        "CLIENT_NAME: {1}\n"
-        "MESSAGE: {2}\n"
+        "CHAT:{0}\n"
+        "CLIENT_NAME:{1}\n"
+        "MESSAGE:{2}\n"
     ).format(chat_room_id, client_name, message)
 
 
