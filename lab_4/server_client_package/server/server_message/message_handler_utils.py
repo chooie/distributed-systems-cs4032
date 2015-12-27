@@ -25,6 +25,8 @@ def handle_join_chat_room(values, server_thread):
 
     server_thread.request.sendall(response)
 
+    write_message("Message sent to client", '')
+
 
 def handle_leave_chat_room(values, server_thread):
     chat_room_name = values["LEAVE_CHATROOM"]
