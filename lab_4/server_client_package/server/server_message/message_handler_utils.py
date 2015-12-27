@@ -12,14 +12,6 @@ def handle_join_chat_room(values, server_thread):
     chat_room_name = values["JOIN_CHATROOM"]
     client_name = values["CLIENT_NAME"]
 
-    chat = server_thread.chat
-
-    chat.add_active_client(client_name, client_id, server_thread)
-
-    chat_room = chat.add_chat_room(chat_room_name)
-
-    chat_room.add_member(client_name, client_id, server_thread)
-
     response = create_joined_chat_room_message(values)
 
     write_message("Handle join chat message:", response)
@@ -29,6 +21,14 @@ def handle_join_chat_room(values, server_thread):
     server_thread.request.sendall(response)
 
     write_message("Message sent to client", '')
+
+    chat = server_thread.chat
+
+    chat.add_active_client(client_name, client_id, server_thread)
+
+    chat_room = chat.add_chat_room(chat_room_name)
+
+    chat_room.add_member(client_name, client_id, server_thread)
 
 
 def handle_leave_chat_room(values, server_thread):
