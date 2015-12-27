@@ -35,7 +35,7 @@ def message_handler(server_thread):
         message_type = get_message_dict_type(values)
 
         if message_type not in handlers:
-            # Make more specific
+            # Todo: Make more specific
             raise Exception
 
         handlers[message_type]()
