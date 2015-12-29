@@ -1,3 +1,5 @@
+from time import sleep
+
 from server_client_package.server.log import write_message
 from server_client_package.server.server_message.message import \
     create_joined_chat_room_message, create_left_chat_room_message, \
@@ -49,13 +51,13 @@ def handle_leave_chat_room(values, server_thread):
         write_message("Error:", "Client ID and Name don't match!")
         raise Exception
 
-    chat_room.remove_member(client_by_id)
-
     response = create_left_chat_room_message(values)
 
     write_message("Handle leave chat message:", response)
 
     server_thread.request.sendall(response)
+
+    chat_room.remove_member(client_by_id)
 
 
 def handle_disconnect(values, server_thread):
