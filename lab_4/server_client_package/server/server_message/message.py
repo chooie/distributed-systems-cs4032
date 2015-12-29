@@ -4,19 +4,15 @@ from server_client_package.shared_lib.string import \
 from server_client_package.shared_lib.constants import HOST, PORT
 
 
-def create_joined_chat_room_message(values):
-    chat_room_name = values["JOIN_CHATROOM"]
+def create_joined_chat_room_message(chat_room_name, room_ref, join_id):
 
-    # TODO: come up with way of creating ids
-    chat_room_id = "12345"
-    client_id = "54321"
     return (
-            "JOINED_CHATROOM:{0}\n"
-            "SERVER_IP:{1}\n"
-            "PORT:{2}\n"
-            "ROOM_REF:{3}\n"
-            "JOIN_ID:{4}\n"
-        ).format(chat_room_name, HOST, PORT, chat_room_id, client_id)
+        "JOINED_CHATROOM:{0}\n"
+        "SERVER_IP:{1}\n"
+        "PORT:{2}\n"
+        "ROOM_REF:{3}\n"
+        "JOIN_ID:{4}\n"
+    ).format(chat_room_name, HOST, PORT, room_ref, join_id)
 
 
 def create_left_chat_room_message(values):

@@ -47,12 +47,14 @@ def bill_scenario(ip, port):
             sys.stdout.write(response + "\n")
             break
 
-        message = create_leave_chat_room_message(chat_room, 0, client_name)
+        sleep(2)
+
+        message = create_leave_chat_room_message(0, 0, client_name)
         sock.sendall(message)
         response = sock.recv(BUFFER_SIZE)
         sys.stdout.write(response + "\n")
 
-        sleep(randint(0, 2))
+        sleep(2)
 
         message = create_disconnect_message(client_name)
         sock.sendall(message)
@@ -84,10 +86,14 @@ def charlie_scenario(ip, port):
             response = sock.recv(BUFFER_SIZE)
             sys.stdout.write(response + "\n")
 
-            message = create_leave_chat_room_message(chat_room, 0, client_name)
+            sleep(4)
+
+            message = create_leave_chat_room_message(0, 0, client_name)
             sock.sendall(message)
             response = sock.recv(BUFFER_SIZE)
             sys.stdout.write(response + "\n")
+
+            sleep(4)
 
             message = create_disconnect_message(client_name)
             sock.sendall(message)

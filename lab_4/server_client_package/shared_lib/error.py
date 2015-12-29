@@ -75,8 +75,14 @@ class DuplicateChatRoomError(InformClientError):
 
 
 class NonExistantChatRoomError(InformClientError):
-    def __init__(self):
+    def __init__(self, chat_room_id=None):
+        if chat_room_id is None:
+            message = "This chat room doesn't exist"
+        else:
+            message = "Chat room with ID, '{0}', doesn't exist".format(
+                chat_room_id,
+            )
         super(NonExistantChatRoomError, self).__init__(
             NON_EXISTANT_CHAT_ROOM_ERROR,
-            "This chat room doesn't exist"
+            message
         )
