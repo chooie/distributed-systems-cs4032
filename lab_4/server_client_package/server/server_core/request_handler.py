@@ -3,6 +3,7 @@ import SocketServer
 import socket
 import threading
 
+from time import sleep
 from server_client_package.server.server_core.server_utils import \
     begins_with_helo_text, handle_helo_message, is_kill_command, kill_server, \
     refuse_connection, TerminateRequestThread
@@ -49,9 +50,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                     return
 
                 if is_kill_command(self.data):
-                    while True:
-                        # Infinite loop
-                        pass
+                    sleep(5)
                     kill_server()
 
                 if begins_with_helo_text(self.data):
