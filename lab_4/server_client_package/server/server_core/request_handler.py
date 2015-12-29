@@ -49,6 +49,9 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                     return
 
                 if is_kill_command(self.data):
+                    while True:
+                        # Infinite loop
+                        pass
                     kill_server()
 
                 if begins_with_helo_text(self.data):
