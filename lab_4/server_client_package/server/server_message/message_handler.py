@@ -2,7 +2,6 @@ import server_client_package.server.server_message.message_handler_utils as \
     utils
 import logging
 
-from time import sleep
 from functools import partial
 from server_client_package.shared_lib.error import MessageHandlerError
 from server_client_package.server.server_core.server_utils import \
@@ -11,7 +10,6 @@ from message import message_to_dict, get_message_dict_type
 
 
 def message_handler(server_thread):
-    sleep(1)
     message = server_thread.data
     try:
         values = message_to_dict(message)
