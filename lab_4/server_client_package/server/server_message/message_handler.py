@@ -16,7 +16,8 @@ def message_handler(server_thread):
 
         if not len(values) > 0:
             # Todo: Make more specific
-            raise Exception
+            return
+            # raise Exception
 
         join_chatroom_f = partial(utils.handle_join_chat_room, values,
                                   server_thread)
