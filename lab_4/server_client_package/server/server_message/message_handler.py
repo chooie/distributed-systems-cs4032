@@ -15,8 +15,7 @@ def message_handler(server_thread):
         values = message_to_dict(message)
 
         if not len(values) > 0:
-            return
-            # raise TerminateRequestThread
+            raise TerminateRequestThread
 
         join_chatroom_f = partial(utils.handle_join_chat_room, values,
                                   server_thread)
