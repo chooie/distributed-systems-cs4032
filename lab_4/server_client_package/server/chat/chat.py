@@ -35,6 +35,8 @@ class Chat:
 
             # Loop through chat rooms and remove client
             for chat_room in client.chat_rooms:
+                print "Chat Rooms:"
+                print client.chat_rooms
                 chat_room.remove_member(client)
 
             client.thread_handle.terminate_request = True
