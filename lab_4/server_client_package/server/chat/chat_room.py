@@ -30,6 +30,8 @@ class ChatRoom:
 
             self.members.pop(client.id, None)
 
+            client.remove_chat_room(self)
+
         safe(self.lock, partial(f))
 
     def add_member(self, client):
@@ -47,6 +49,8 @@ class ChatRoom:
             ).format(self.id, client.name, message)
 
             self.send_message_to_all_members(message)
+
+            client.add_chat_room(self)
 
         safe(self.lock, partial(f))
 

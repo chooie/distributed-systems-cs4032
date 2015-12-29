@@ -21,7 +21,7 @@ class Chat:
             # Add if client isn't already in dict
             if not self.get_active_client_by_name(client_name):
                 # Add client
-                client_obj = Client(client_name, [], thread_handle)
+                client_obj = Client(client_name, thread_handle)
                 self.active_clients[client_obj.id] = client_obj
 
             # Do nothing if they're already a member
@@ -34,7 +34,7 @@ class Chat:
             client = self.get_active_client_by_name(client_name)
 
             # Loop through chat rooms and remove client
-            for chat_room in client.chat_rooms:
+            for chat_room in client.chat_rooms.values():
                 print "Chat Rooms:"
                 print client.chat_rooms
                 chat_room.remove_member(client)
