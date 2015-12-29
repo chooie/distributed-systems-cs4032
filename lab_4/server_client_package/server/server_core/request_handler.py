@@ -1,8 +1,8 @@
+import os
 import sys
 import SocketServer
 import socket
 import threading
-
 
 from server_client_package.server.server_core.server_utils import \
     begins_with_helo_text, handle_helo_message, is_kill_command, kill_server, \
@@ -51,6 +51,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
                 if is_kill_command(self.data):
                     kill_server()
+                    self.server.shutdown()
 
                 if begins_with_helo_text(self.data):
                     (host, port) = self.server.server_address
@@ -74,9 +75,13 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         except TerminateRequestThread:
             sys.stdout.write("Terminate thread\n")
             pass
+        except SystemExit:
+            self.server.shutdown()
+            self.server.server_close()
+            os._exit(0)
         except:
             print "Unexpected error:", sys.exc_info
-            kill_server()
+            raise
         finally:
             sys.stdout.write("Client disconnected\n")
             # Release semaphore on thread destruction

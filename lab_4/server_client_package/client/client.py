@@ -38,6 +38,10 @@ def leave_chat_scenario(ip, port, chat_room_name, client_name):
     utils.execute_scenario(ip, port, leave_chat)
 
 
+def kill_server_scenario(ip, port):
+    utils.execute_scenario(ip, port, lambda: 'KILL_SERVICE\n')
+
+
 def run():
     threads = []
 
@@ -81,11 +85,18 @@ def run():
     # threads.append(t)
     # t.start()
 
+    t = threading.Thread(
+        target=kill_server_scenario,
+        args=(HOST, PORT)
+    )
+    threads.append(t)
+    t.start()
+
     # Bill scenario
     t = threading.Thread(
-            target=utils.bill_scenario,
-            args=(HOST, PORT)
-        )
+        target=utils.bill_scenario,
+        args=(HOST, PORT)
+    )
     threads.append(t)
     t.start()
 

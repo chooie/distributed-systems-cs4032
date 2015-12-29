@@ -15,7 +15,6 @@ def execute_scenario(ip, port, message_f):
     sock.connect((ip, port))
     message = message_f()
     try:
-        sleep(randint(1, 5))
         sock.sendall(message)
         response = sock.recv(BUFFER_SIZE)
         sys.stdout.write(response + "\n")
