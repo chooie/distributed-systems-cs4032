@@ -7,7 +7,7 @@ def is_kill_command(data):
 
 
 def kill_server():
-    sys.stdout.write("Kill Request!")
+    sys.stdout.write("Kill Request!\n")
     sys.exit()
 
 
