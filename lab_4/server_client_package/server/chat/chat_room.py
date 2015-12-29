@@ -18,8 +18,6 @@ class ChatRoom:
 
     def remove_member(self, client):
         def f():
-            self.members.pop(client.id, None)
-
             message = "{0} has left this chatroom.\n".format(client.name)
 
             message = (
@@ -29,6 +27,8 @@ class ChatRoom:
             ).format(self.id, client.name, message)
 
             self.send_message_to_all_members(message)
+
+            self.members.pop(client.id, None)
 
         safe(self.lock, partial(f))
 
