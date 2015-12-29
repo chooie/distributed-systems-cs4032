@@ -69,7 +69,7 @@ def handle_disconnect(values, server_thread):
 
 
 def handle_chat(values, server_thread):
-    chat_room_name = values["CHAT"]
+    chat_room_ref = values["CHAT"]
 
     response = create_chat_message(values)
 
@@ -77,6 +77,6 @@ def handle_chat(values, server_thread):
 
     chat = server_thread.chat
 
-    chat_room = chat.get_chat_room_by_name(chat_room_name)
+    chat_room = chat.get_chat_room_by_id(chat_room_ref)
 
     chat_room.send_message_to_all_members(response)
