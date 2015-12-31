@@ -1,4 +1,3 @@
-import os
 import sys
 import server_client_package.server.log
 
@@ -7,10 +6,10 @@ def is_kill_command(data):
     return data == "KILL_SERVICE\n"
 
 
-def kill_server():
+def kill_server(server_thread):
     sys.stdout.write("Kill Request!\n")
-    os._exit(0)
-    # sys.exit()
+    server_thread.client_connected = False
+    server_thread.server.server_alive = False
 
 
 def begins_with_helo_text(data):

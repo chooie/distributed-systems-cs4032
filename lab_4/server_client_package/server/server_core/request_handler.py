@@ -24,6 +24,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     def __init__(self, client_address, request, server):
         # Not set until it is read from client
         self.data = None
+        self.client_connected = True
         self.chat = ThreadedTCPRequestHandler.chat
         self.terminate_request = False
         SocketServer.BaseRequestHandler.\
@@ -34,7 +35,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         handled = False  # Only acquire semaphore on first iteration
 
         try:
-            while True:
+            while self.client_connected:
                 if self.terminate_request:
                     raise TerminateRequestThread
 
@@ -49,7 +50,8 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                     return
 
                 if is_kill_command(self.data):
-                    kill_server()
+                    kill_server(self)
+                    return
 
                 if begins_with_helo_text(self.data):
                     (host, port) = self.server.server_address
@@ -86,4 +88,5 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     request_queue_size = 100
     allow_reuse_address = True
+    server_alive = True
     pass

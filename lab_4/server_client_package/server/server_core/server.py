@@ -21,10 +21,12 @@ def run():
         server_thread.start()
         log.server_start(server_thread)
 
-        while True:
+        while server.server_alive:
             # Loop until server shut down
             pass
     except (KeyboardInterrupt, SystemExit):
+        pass
+    finally:
         utils.clean_up_server(server)
 
 if __name__ == "__main__":
