@@ -40,7 +40,8 @@ def handle_leave_chat_room(values, server_thread):
     chat_room = chat.get_chat_room_by_id(chat_room_id)
 
     if chat_room is None:
-        raise NonExistantChatRoomError(chat_room_id)
+        raise Exception
+        # raise NonExistantChatRoomError(chat_room_id)
 
     client_by_id = chat_room.get_member_by_id(client_id)
     client_by_name = chat_room.get_member_by_name(client_name)

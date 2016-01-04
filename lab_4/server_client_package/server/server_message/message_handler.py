@@ -42,4 +42,5 @@ def message_handler(server_thread):
         raise TerminateRequestThread
     except Exception, e:
         logging.exception(e)
-        raise MessageHandlerError(message)
+        raise Exception
+        # raise MessageHandlerError(message)
