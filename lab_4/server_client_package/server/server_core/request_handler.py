@@ -51,7 +51,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
                 if is_kill_command(self.data):
                     kill_server(self)
-                    return
+                    continue
 
                 if begins_with_helo_text(self.data):
                     (host, port) = self.server.server_address

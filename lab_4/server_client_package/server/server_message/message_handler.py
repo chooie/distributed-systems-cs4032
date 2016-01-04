@@ -15,7 +15,8 @@ def message_handler(server_thread):
         values = message_to_dict(message)
 
         if not len(values) > 0:
-            raise TerminateRequestThread
+            return
+            # raise TerminateRequestThread
 
         join_chatroom_f = partial(utils.handle_join_chat_room, values,
                                   server_thread)
@@ -35,12 +36,13 @@ def message_handler(server_thread):
 
         if message_type not in handlers:
             # Todo: Make more specific
-            raise Exception
+            return  # raise Exception
 
         handlers[message_type]()
     except TerminateRequestThread:
         raise TerminateRequestThread
     except Exception, e:
         logging.exception(e)
-        raise Exception
+        return
+        # raise Exception
         # raise MessageHandlerError(message)

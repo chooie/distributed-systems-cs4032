@@ -70,7 +70,8 @@ class Chat:
     def remove_chat_room(self, chat_room_id):
         chat_room = self.chat_rooms.pop(chat_room_id, None)
         if not chat_room:
-            raise NonExistantChatRoomError(chat_room_id)
+            return
+            # raise NonExistantChatRoomError(chat_room_id)
 
     def get_chat_room_by_name(self, chat_room_name):
         for chat_room_id in self.chat_rooms:
