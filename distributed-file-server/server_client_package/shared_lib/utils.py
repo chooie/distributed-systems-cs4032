@@ -13,3 +13,17 @@ def run_server(handler):
     host = sys.argv[1]
     port = int(sys.argv[2])
     run(host, port, handler)
+
+
+def parse_message(message):
+    return remove_empty_elements(message.split("\n"))
+
+
+
+
+def remove_empty_elements(arr):
+    return filter(None, arr)
+
+
+def remove_whitespace_from_elements(arr):
+    return map(lambda x: x.strip(), arr)

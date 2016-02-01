@@ -4,6 +4,7 @@ import os
 from server.server_core.request_handler import ThreadedTCPRequestHandler
 from shared_lib.utils import run_server
 from shared_lib.constants import BUFFER_SIZE
+from shared_lib.utils import parse_message
 
 script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
 
@@ -12,11 +13,19 @@ class FileHandler(ThreadedTCPRequestHandler):
     files = ["lorem_ipsum_large.txt", "yin_yang.svg"]
 
     def handle_message(self):
-        print "I'm a file handler!"
         # print self.data
+        message_array = parse_message(self.data)
 
-        if self.data in self.files:
-            self.send_file(self.data)
+        if len(message_array) > 1:
+            domain = message_array[0]
+            action_type = message_array[1]
+            body = message_array[2]
+
+            if domain == "File":
+                if action_type == "Read":
+                    if body in self.files:
+                        print body
+                        self.send_file(body)
 
         else:
             self.request.sendall("Unrecognised message")
@@ -27,6 +36,8 @@ class FileHandler(ThreadedTCPRequestHandler):
         :param file_id: Unique string for file
         :return: a handle to the file
         """
+
+        print "Sending file..."
 
         socket = self.request
 

@@ -8,5 +8,5 @@
 *.pyc
 
 # Ignore files and directories
-.log
+*.log
 .files-*/

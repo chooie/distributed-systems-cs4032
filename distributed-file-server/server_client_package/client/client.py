@@ -4,8 +4,7 @@ import logging
 import threading
 import client_utils as utils
 
-from message import create_helo_message, create_some_dummy_message,\
-    create_kill_message
+from message import create_helo_message, create_some_dummy_message
 from shared_lib.constants import STATIC_HOST, STATIC_PORT
 
 script_dir = os.path.dirname(__file__)  # Absolute dir the script is in

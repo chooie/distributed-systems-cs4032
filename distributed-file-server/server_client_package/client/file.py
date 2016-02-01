@@ -2,6 +2,8 @@ import os
 import logging
 
 from shared_lib.constants import BUFFER_SIZE
+from message import create_read_file_message
+
 
 script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
 
@@ -14,8 +16,9 @@ def read_file(file_id, socket):
     :return: a handle to the file
     """
 
-    # Request file from server
-    socket.send(file_id)
+    read_file_message = create_read_file_message(file_id)
+
+    socket.send(read_file_message)
 
     rel_path = ".files/" + file_id
     abs_file_path = os.path.join(script_dir, rel_path)
@@ -34,7 +37,6 @@ def read_file(file_id, socket):
 
             file_contents += file_chunk
 
-        print file_contents
         f.write(file_contents)
         logging.info("Downloading finished...")
     return f
