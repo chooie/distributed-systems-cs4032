@@ -19,11 +19,11 @@ def execute_scenario(ip, port, message_f):
         handle_socket_exception(e, sock)
 
 
-def read_file_scenario(ip, port):
+def read_file_scenario(ip, port, file_name):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
     try:
-        f = file.read_file("yin_yang.svg", sock)
+        f = file.read_file(file_name, sock)
         # print f
         sock.close()
     except socket.error, e:

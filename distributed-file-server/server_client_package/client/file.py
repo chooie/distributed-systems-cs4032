@@ -26,14 +26,15 @@ def read_file(file_id, socket):
 
         file_contents = ''
 
-        # while True:
-        file_chunk = socket.recv(BUFFER_SIZE)
+        while True:
+            file_chunk = socket.recv(BUFFER_SIZE)
 
-        # if not file_chunk:
-        #     break
+            if file_chunk == "END_FILE":
+                break
 
-        file_contents += file_chunk
+            file_contents += file_chunk
 
+        print file_contents
         f.write(file_contents)
         logging.info("Downloading finished...")
     return f

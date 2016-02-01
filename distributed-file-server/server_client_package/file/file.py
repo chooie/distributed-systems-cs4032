@@ -16,7 +16,11 @@ class FileHandler(ThreadedTCPRequestHandler):
         if self.data == "yin_yang.svg":
             self.send_file("yin_yang.svg")
 
-        self.request.sendall("Unrecognised message")
+        if self.data == "lorem_ipsum_large.txt":
+            self.send_file("lorem_ipsum_large.txt")
+
+        else:
+            self.request.sendall("Unrecognised message")
 
     def send_file(self, file_id):
         """
@@ -38,6 +42,8 @@ class FileHandler(ThreadedTCPRequestHandler):
         print file_contents
 
         socket.sendall(file_contents)
+
+        socket.send("END_FILE")
 
         print "Finished sending file..."
 
