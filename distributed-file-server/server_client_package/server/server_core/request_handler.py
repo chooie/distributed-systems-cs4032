@@ -3,30 +3,27 @@ import SocketServer
 import socket
 import threading
 
-from server_utils import begins_with_helo_text, \
-    handle_helo_message, is_kill_command, kill_server, refuse_connection, \
-    TerminateRequestThread
-from server.server_message.message_handler import message_handler
+from server_utils import begins_with_helo_text, handle_helo_message, \
+    is_kill_command, kill_server, refuse_connection, TerminateRequestThread
 from shared_lib.constants import MAX_NUMBER_OF_CLIENTS, BUFFER_SIZE, \
     DO_NOT_BLOCK, STUDENT_ID
-from shared_lib.error import handle_socket_exception, InformClientError,\
-    MessageHandlerError
-from server.log import error_processing, processing
-from server.chat.chat import Chat
+from shared_lib.error import handle_socket_exception
+from server.log import processing
 
 
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     # If semaphore blocks, client's connection will be refused
     semaphore = threading.BoundedSemaphore(MAX_NUMBER_OF_CLIENTS)
-    chat = Chat()
 
     def __init__(self, client_address, request, server):
         # Not set until it is read from client
         self.data = None
-        self.chat = ThreadedTCPRequestHandler.chat
         self.terminate_request = False
         SocketServer.BaseRequestHandler.\
             __init__(self, client_address, request, server)
+
+    def handle_message(self):
+        print "You shouldn't see this."
 
     def handle(self):
         semaphore = ThreadedTCPRequestHandler.semaphore
@@ -39,6 +36,9 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
                 # self.request is the TCP socket connected to the client
                 self.data = self.request.recv(BUFFER_SIZE)
+
+                if not self.data:
+                    continue
 
                 processing(self.data)
 
@@ -57,14 +57,8 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
                 # Do work
                 try:
-                    message_handler(self)
+                    self.handle_message()
                     handled = True
-                except MessageHandlerError, e:
-                    error_processing(e.original_message)
-                    self.request.sendall(e.get_error_message())
-                except InformClientError, e:
-                    sys.stdout.write("Informing client of error\n")
-                    self.request.sendall(e.get_error_message())
                 except:
                     raise
         except socket.error, e:
@@ -80,9 +74,3 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             # Release semaphore on thread destruction
             if handled:
                 semaphore.release()
-
-
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-    request_queue_size = 100
-    allow_reuse_address = True
-    pass

@@ -1,112 +1,53 @@
+import os
+import sys
+import logging
 import threading
 import client_utils as utils
 
-from functools import partial
+from message import create_helo_message, create_some_dummy_message,\
+    create_kill_message
+from shared_lib.constants import STATIC_HOST, STATIC_PORT
 
-from message import create_helo_message, \
-    create_bad_message, create_disconnect_message, \
-    create_join_chat_room_message, create_leave_chat_room_message
-from shared_lib.constants import HOST, PORT
-
-
-def helo_scenario(ip, port):
-    helo = partial(create_helo_message)
-    utils.execute_scenario(ip, port, helo)
-
-
-def bad_message_scenario(ip, port):
-    bad = partial(create_bad_message)
-    utils.execute_scenario(ip, port, bad)
-
-
-def disconnect_scenario(ip, port):
-    disconnect = partial(create_disconnect_message, 'bill')
-    utils.execute_scenario(ip, port, disconnect)
-
-
-def join_chat_scenario(ip, port, chat_room_name, client_name):
-    join_chat = partial(
-        create_join_chat_room_message, chat_room_name, client_name
-    )
-    utils.execute_scenario(ip, port, join_chat)
-
-
-def leave_chat_scenario(ip, port, chat_room_name, client_name):
-    leave_chat = partial(
-        create_leave_chat_room_message, chat_room_name, 0, client_name
-    )
-    utils.execute_scenario(ip, port, leave_chat)
-
-
-def kill_server_scenario(ip, port):
-    utils.execute_scenario(ip, port, lambda: 'KILL_SERVICE\n')
+script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
+log_path = os.path.join(script_dir, 'client-log.log')
 
 
 def run():
+    logging.basicConfig(filename=log_path, level=logging.INFO)
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
     threads = []
 
-    # # HELO scenario
-    # t = threading.Thread(
-    #         target=helo_scenario,
-    #         args=(HOST, PORT)
-    #     )
-    # threads.append(t)
-    # t.start()
-    #
-    # # Bad message scenario
-    # t = threading.Thread(
-    #     target=bad_message_scenario,
-    #     args=(HOST, PORT)
-    # )
-    # threads.append(t)
-    # t.start()
-    #
-    # # Disconnect scenario
-    # t = threading.Thread(
-    #         target=disconnect_scenario,
-    #         args=(HOST, PORT)
-    #     )
-    # threads.append(t)
-    # t.start()
-    #
-    # # Test join chat room
-    # t = threading.Thread(
-    #         target=join_chat_scenario,
-    #         args=(HOST, PORT, "cats", "charlie")
-    #     )
-    # threads.append(t)
-    # t.start()
-    #
-    # # Test leave chat room
-    # t = threading.Thread(
-    #         target=leave_chat_scenario,
-    #         args=(HOST, PORT, "cats", "charlie")
-    #     )
-    # threads.append(t)
-    # t.start()
-
-    # t = threading.Thread(
-    #     target=kill_server_scenario,
-    #     args=(HOST, PORT)
-    # )
-    # threads.append(t)
-    # t.start()
-
-    # Bill scenario
+    # HELO scenario
     t = threading.Thread(
-        target=utils.bill_scenario,
-        args=(HOST, PORT)
+            target=utils.execute_scenario,
+            args=(STATIC_HOST, STATIC_PORT, create_helo_message)
     )
     threads.append(t)
     t.start()
 
-    # Charlie scenario
     t = threading.Thread(
-            target=utils.charlie_scenario,
-            args=(HOST, PORT)
-        )
+            target=utils.execute_scenario,
+            args=(STATIC_HOST, STATIC_PORT, create_some_dummy_message)
+    )
     threads.append(t)
     t.start()
+
+    t = threading.Thread(
+            target=utils.read_file_scenario,
+            args=(STATIC_HOST, STATIC_PORT)
+    )
+    threads.append(t)
+    t.start()
+
 
 if __name__ == "__main__":
     run()

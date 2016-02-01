@@ -1,6 +1,6 @@
 import os
 import sys
-import server_client_package.server.log
+import server.log as log
 
 
 def is_kill_command(data):
@@ -10,7 +10,6 @@ def is_kill_command(data):
 def kill_server():
     sys.stdout.write("Kill Request!\n")
     os._exit(0)
-    # sys.exit()
 
 
 def begins_with_helo_text(data):
@@ -34,7 +33,7 @@ def clean_up_server(server):
 
 
 def refuse_connection(thread):
-    server_client_package.server.log.refused(thread.data)
+    log.refused(thread.data)
     thread.request.send("Connection Refused\n")
     thread.request.close()
 

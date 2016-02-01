@@ -6,3 +6,7 @@
 
 # Ignore Python Bytecode
 *.pyc
+
+# Ignore files and directories
+.log
+.files-*/

@@ -1,38 +1,4 @@
 from collections import OrderedDict
-from server_client_package.shared_lib.string import \
-    add_newline_at_end_if_missing
-from server_client_package.shared_lib.constants import HOST, PORT
-
-
-def create_joined_chat_room_message(chat_room_name, room_ref, join_id):
-
-    return (
-        "JOINED_CHATROOM:{0}\n"
-        "SERVER_IP:{1}\n"
-        "PORT:{2}\n"
-        "ROOM_REF:{3}\n"
-        "JOIN_ID:{4}\n"
-    ).format(chat_room_name, HOST, PORT, room_ref, join_id)
-
-
-def create_left_chat_room_message(values):
-    chat_room_id = values["LEAVE_CHATROOM"]
-    client_id = values["JOIN_ID"]
-    return (
-        "LEFT_CHATROOM:{0}\n"
-        "JOIN_ID:{1}\n"
-    ).format(chat_room_id, client_id)
-
-
-def create_chat_message(values):
-    chat_room_id = values["CHAT"]
-    client_name = values["CLIENT_NAME"]
-    message = add_newline_at_end_if_missing(values["MESSAGE"])
-    return (
-        "CHAT:{0}\n"
-        "CLIENT_NAME:{1}\n"
-        "MESSAGE:{2}\n"
-    ).format(chat_room_id, client_name, message)
 
 
 def remove_empty_elements(arr):
