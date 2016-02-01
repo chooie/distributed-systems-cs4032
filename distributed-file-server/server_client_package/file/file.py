@@ -9,15 +9,14 @@ script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
 
 
 class FileHandler(ThreadedTCPRequestHandler):
+    files = ["lorem_ipsum_large.txt", "yin_yang.svg"]
+
     def handle_message(self):
         print "I'm a file handler!"
         # print self.data
 
-        if self.data == "yin_yang.svg":
-            self.send_file("yin_yang.svg")
-
-        if self.data == "lorem_ipsum_large.txt":
-            self.send_file("lorem_ipsum_large.txt")
+        if self.data in self.files:
+            self.send_file(self.data)
 
         else:
             self.request.sendall("Unrecognised message")

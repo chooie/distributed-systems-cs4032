@@ -43,7 +43,7 @@ def run():
 
     t = threading.Thread(
             target=utils.read_file_scenario,
-            args=(STATIC_HOST, STATIC_PORT, "lorem_ipsum_large.txt")
+            args=(STATIC_HOST, STATIC_PORT, "yin_yang.svg")
     )
     threads.append(t)
     t.start()
