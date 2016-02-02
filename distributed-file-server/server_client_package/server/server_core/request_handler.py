@@ -14,6 +14,7 @@ from server.log import processing
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     # If semaphore blocks, client's connection will be refused
     semaphore = threading.BoundedSemaphore(MAX_NUMBER_OF_CLIENTS)
+    handler_num = 0
 
     def __init__(self, client_address, request, server):
         # Not set until it is read from client
@@ -29,6 +30,9 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         semaphore = ThreadedTCPRequestHandler.semaphore
         handled = False  # Only acquire semaphore on first iteration
 
+        my_num = ThreadedTCPRequestHandler.handler_num
+        ThreadedTCPRequestHandler.handler_num += 1
+
         try:
             while True:
                 if self.terminate_request:
@@ -38,7 +42,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
                 self.data = self.request.recv(BUFFER_SIZE)
 
                 if not self.data:
-                    continue
+                    break
 
                 processing(self.data)
 

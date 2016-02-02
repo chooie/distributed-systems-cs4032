@@ -41,7 +41,7 @@ def run():
     t.start()
 
     t = threading.Thread(
-            target=utils.read_file_scenario,
+            target=utils.file_scenario,
             args=(STATIC_HOST, STATIC_PORT, "yin_yang.svg")
     )
     threads.append(t)

@@ -19,8 +19,6 @@ def parse_message(message):
     return remove_empty_elements(message.split("\n"))
 
 
-
-
 def remove_empty_elements(arr):
     return filter(None, arr)
 

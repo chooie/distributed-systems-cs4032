@@ -3,7 +3,6 @@ import os
 
 from server.server_core.request_handler import ThreadedTCPRequestHandler
 from shared_lib.utils import run_server
-from shared_lib.constants import BUFFER_SIZE
 from shared_lib.utils import parse_message
 
 script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
@@ -22,13 +21,13 @@ class FileHandler(ThreadedTCPRequestHandler):
             body = message_array[2]
 
             if domain == "File":
-                if action_type == "Read":
+                if action_type == "Open":
                     if body in self.files:
                         print body
                         self.send_file(body)
 
         else:
-            self.request.sendall("Unrecognised message")
+            self.request.sendall("Unrecognised message:\n" + self.data)
 
     def send_file(self, file_id):
         """
