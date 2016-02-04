@@ -9,4 +9,4 @@
 
 # Ignore files and directories
 *.log
-.files*/
+.files*/*
