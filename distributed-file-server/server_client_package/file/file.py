@@ -1,9 +1,12 @@
 import logging
 import os
+import sys
+import shared_lib.message as msg
 
 from server.server_core.request_handler import ThreadedTCPRequestHandler
 from shared_lib.utils import run_server
-from shared_lib.utils import parse_message
+from shared_lib.constants import BUFFER_SIZE
+
 
 script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
 
@@ -13,18 +16,13 @@ class FileHandler(ThreadedTCPRequestHandler):
 
     def handle_message(self):
         # print self.data
-        message_array = parse_message(self.data)
+        message = msg.create_message_obj(self.data)
 
-        if len(message_array) > 1:
-            domain = message_array[0]
-            action_type = message_array[1]
-            body = message_array[2]
+        if isinstance(message, msg.Download):
+            self.send_file(message.file_name)
 
-            if domain == "File":
-                if action_type == "Open":
-                    if body in self.files:
-                        print body
-                        self.send_file(body)
+        elif isinstance(message, msg.Upload):
+            self.store_file(message.file_name, message.file_size)
 
         else:
             self.request.sendall("Unrecognised message:\n" + self.data)
@@ -35,9 +33,6 @@ class FileHandler(ThreadedTCPRequestHandler):
         :param file_id: Unique string for file
         :return: a handle to the file
         """
-
-        print "Sending file..."
-
         socket = self.request
 
         rel_path = ".files/" + file_id
@@ -48,18 +43,71 @@ class FileHandler(ThreadedTCPRequestHandler):
 
         file_contents = f.read()
 
-        print file_contents
+        file_size = os.path.getsize(abs_file_path)
+
+        logging.info("Sending file write request: " + file_id)
+
+        request_message = msg.create_upload_file_message(file_id, file_size)
+
+        socket.sendall(request_message)
+
+        logging.info("Sending file write request finished: " + file_id)
+
+        logging.info("Reading confirmation message: " + file_id)
+
+        confirmation_message = socket.recv(BUFFER_SIZE)
+
+        logging.info(confirmation_message)
+
+        logging.info("Reading confirmation message finished: " + file_id)
+
+
+
+        logging.info("Sending file: " + file_id)
 
         socket.sendall(file_contents)
 
-        socket.send("END_FILE")
-
-        print "Finished sending file..."
+        logging.info("Sending file finished: " + file_id)
 
         f.close()
+
+    def store_file(self, file_id, file_size):
+        socket = self.request
+
+        rel_path = ".files/" + file_id
+
+        abs_file_path = os.path.join(script_dir, rel_path)
+
+        logging.info("Downloading file: " + file_id)
+
+        with open(abs_file_path, 'w') as f:
+            file_contents = ''
+
+            while True:
+                file_chunk = socket.recv(BUFFER_SIZE)
+                logging.info(file_chunk)
+
+                if file_chunk == "END_FILE":
+                    break
+
+                file_contents += file_chunk
+
+            f.write(file_contents)
+
+        logging.info("Downloading file finished: " + file_id)
 
 
 if __name__ == "__main__":
     logging.basicConfig(filename='file-log.log', level=logging.DEBUG)
+
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
 
     run_server(FileHandler)

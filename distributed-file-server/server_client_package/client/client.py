@@ -1,11 +1,11 @@
+import logging
 import os
 import sys
-import logging
 import threading
-import client_utils as utils
 
-from message import create_helo_message, create_some_dummy_message
+import client_utils as utils
 from shared_lib.constants import STATIC_HOST, STATIC_PORT
+from shared_lib.message import create_helo_message, create_some_dummy_message
 
 script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
 log_path = os.path.join(script_dir, 'client-log.log')

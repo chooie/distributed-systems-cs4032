@@ -24,6 +24,8 @@ def file_scenario(ip, port, file_name):
     sock.connect((ip, port))
     try:
         f = file.open_file(file_name, sock)
+        # f.write("HELLO THERE!")
+        # f.close()
         sock.close()
     except socket.error, e:
         handle_socket_exception(e, sock)

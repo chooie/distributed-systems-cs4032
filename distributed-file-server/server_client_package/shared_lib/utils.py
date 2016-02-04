@@ -15,7 +15,7 @@ def run_server(handler):
     run(host, port, handler)
 
 
-def parse_message(message):
+def message_to_array(message):
     return remove_empty_elements(message.split("\n"))
 
 
