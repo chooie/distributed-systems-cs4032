@@ -1,6 +1,7 @@
-import socket
+import os
 import sys
-import file
+import socket
+import shared_lib.file
 
 from shared_lib.constants import BUFFER_SIZE
 from shared_lib.error import handle_socket_exception
@@ -23,7 +24,13 @@ def file_scenario(ip, port, file_name):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
     try:
-        f = file.open_file(file_name, sock)
+        script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
+        files_path = ".files/"
+
+        abs_directory_path = os.path.join(script_dir, files_path)
+
+        f = shared_lib.file.distributed_open(file_name, abs_directory_path,
+                                             sock)
         # f.write("HELLO THERE!")
         # f.close()
         sock.close()
