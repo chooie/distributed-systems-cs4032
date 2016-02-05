@@ -4,11 +4,16 @@ import sys
 import shared_lib.message as msg
 
 from server.server_core.request_handler import ThreadedTCPRequestHandler
+from shared_lib.LocalFile import LocalFile
+from shared_lib.file import send_file_from_local_to_remote, \
+    send_confirmation_message_to_upload_request, download_file
 from shared_lib.utils import run_server
-from shared_lib.constants import BUFFER_SIZE
+from shared_lib.DistributedFile import DistributedFile
 
 
 script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
+files_path = ".files/"
+abs_directory_path = os.path.join(script_dir, files_path)
 
 
 class FileHandler(ThreadedTCPRequestHandler):
@@ -19,82 +24,57 @@ class FileHandler(ThreadedTCPRequestHandler):
         message = msg.create_message_obj(self.data)
 
         if isinstance(message, msg.Download):
-            self.send_file(message.file_name)
+            logging.info("Processing Download Request: " + message.file_name)
+            self.send_file(message.file_name, abs_directory_path)
+            logging.info("Processing Download Request finished: " +
+                         message.file_name)
 
         elif isinstance(message, msg.Upload):
+            logging.info("Processing Upload Request: " + message.file_name)
             self.store_file(message.file_name, message.file_size)
+            logging.info("Processing Upload Request finished: " +
+                         message.file_name)
 
         else:
             self.request.sendall("Unrecognised message:\n" + self.data)
 
-    def send_file(self, file_id):
-        """
-        Read file from file server
-        :param file_id: Unique string for file
-        :return: a handle to the file
-        """
+    def send_file(self, file_id, abs_directory_path):
         socket = self.request
 
-        rel_path = ".files/" + file_id
-
-        abs_file_path = os.path.join(script_dir, rel_path)
+        abs_file_path = os.path.join(abs_directory_path, file_id)
 
         f = open(abs_file_path, 'r')
 
-        file_contents = f.read()
+        bytes_size = os.path.getsize(abs_file_path)
 
-        file_size = os.path.getsize(abs_file_path)
+        local_file = LocalFile(f, file_id, abs_file_path, bytes_size)
 
-        logging.info("Sending file write request: " + file_id)
+        send_file_from_local_to_remote(local_file, socket)
 
-        request_message = msg.create_upload_file_message(file_id, file_size)
-
-        socket.sendall(request_message)
-
-        logging.info("Sending file write request finished: " + file_id)
-
-        logging.info("Reading confirmation message: " + file_id)
-
-        confirmation_message = socket.recv(BUFFER_SIZE)
-
-        logging.info(confirmation_message)
-
-        logging.info("Reading confirmation message finished: " + file_id)
-
-
-
-        logging.info("Sending file: " + file_id)
-
-        socket.sendall(file_contents)
-
-        logging.info("Sending file finished: " + file_id)
-
-        f.close()
+        local_file.close()
 
     def store_file(self, file_id, file_size):
         socket = self.request
 
-        rel_path = ".files/" + file_id
+        send_confirmation_message_to_upload_request(file_id, file_size, socket)
 
-        abs_file_path = os.path.join(script_dir, rel_path)
+        file_contents = download_file(file_id, file_size, socket)
 
-        logging.info("Downloading file: " + file_id)
+        logging.info("Storing file: " + file_id)
 
-        with open(abs_file_path, 'w') as f:
-            file_contents = ''
+        abs_file_path = os.path.join(abs_directory_path, file_id)
 
-            while True:
-                file_chunk = socket.recv(BUFFER_SIZE)
-                logging.info(file_chunk)
+        f = open(abs_file_path, 'w+')
 
-                if file_chunk == "END_FILE":
-                    break
+        f.write(file_contents)
 
-                file_contents += file_chunk
+        bytes_size = os.path.getsize(abs_file_path)
 
-            f.write(file_contents)
+        local_file = LocalFile(f, file_id, abs_file_path, bytes_size)
 
-        logging.info("Downloading file finished: " + file_id)
+        local_file.close()
+
+        logging.info("Storing file finished: " + file_id)
 
 
 if __name__ == "__main__":

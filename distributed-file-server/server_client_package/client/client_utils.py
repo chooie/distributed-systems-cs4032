@@ -1,10 +1,10 @@
 import os
 import sys
 import socket
-import shared_lib.file
 
 from shared_lib.constants import BUFFER_SIZE
 from shared_lib.error import handle_socket_exception
+from shared_lib.DistributedFile import DistributedFile
 
 
 def execute_scenario(ip, port, message_f):
@@ -29,10 +29,10 @@ def file_scenario(ip, port, file_name):
 
         abs_directory_path = os.path.join(script_dir, files_path)
 
-        f = shared_lib.file.distributed_open(file_name, abs_directory_path,
-                                             sock)
-        # f.write("HELLO THERE!")
-        # f.close()
+        f = DistributedFile.open(file_name, abs_directory_path,
+                                 sock)
+        f.write("HELLO THERE!")
+        f.close()
         sock.close()
     except socket.error, e:
         handle_socket_exception(e, sock)

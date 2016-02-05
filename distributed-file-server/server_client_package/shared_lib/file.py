@@ -6,87 +6,24 @@ from shared_lib import message as msg
 from shared_lib.constants import BUFFER_SIZE
 
 
-class DistributedFile:
-    def __init__(self, file_handle, file_id, abs_file_path, file_size, socket):
-        """
-        Distributed File
-        :param file_handle: A reference to a native Python file IO object
-        :param socket: The socket associated with the file server
-        :return:
-        """
-        self.file_handle = file_handle
-        self.file_id = file_id
-        self.abs_file_path = abs_file_path
-        self.file_size = file_size
-        self.socket = socket
-
-    def read(self):
-        self.file_handle.seek(0)
-        return self.file_handle.read()
-
-    def write(self, content):
-        f = self.file_handle
-        f.seek(0)
-        f.truncate()
-        return f.write(content)
-
-    # def close(self):
-    #     close_file_message = create_close_file_message(self.file_id,
-    #                                                    self.file_size)
-    #
-    #     self.socket.send(close_file_message)
-    #
-    #     logging.info("Uploading file: " + self.file_id)
-    #
-    #     f = self.file_handle
-    #
-    #     f.seek(0)
-    #     file_contents = f.read()
-    #
-    #     logging.info("Close file: " + file_contents)
-    #
-    #     self.socket.sendall(file_contents)
-    #
-    #     logging.info("Uploading file finished: " + self.file_id)
-
-
-def distributed_open(file_id, abs_directory_path, socket):
-    """
-    Read file from file server
-    :param abs_directory_path: Path to where file will be stored
-    :param file_id: Unique string for file
-    :param socket: Socket connection with file server
-    :return: a handle to the file
-    """
-    send_file_download_message(file_id, socket)
-
-    response = read_upload_response_message(file_id, socket)
-
-    upload_message = msg.create_message_obj(response)
-
-    file_name = upload_message.file_name
-
-    assert file_id == file_name
-
-    file_size = upload_message.file_size
-
-    send_confirmation_message_to_upload_request(file_name, file_size, socket)
-
-    file_contents = download_file(file_name, file_size, socket)
-
-    f = prepare_file(file_name, abs_directory_path, file_contents)
-
-    return DistributedFile(f, file_id, f.name, file_size, socket)
-
-
 def send_file_download_message(file_name, socket):
     logging.info("Sending download file request: " + file_name)
 
     download_file_message = msg.create_download_file_message(file_name)
 
-    socket.send(download_file_message)
+    socket.sendall(download_file_message)
 
     logging.info("Sending download file request finished: " + file_name)
+
+
+def send_file_upload_message(file_name, file_size, socket):
+    logging.info("Sending upload file request: " + file_name)
+
+    upload_file_message = msg.create_upload_file_message(file_name,
+                                                         file_size)
+    socket.sendall(upload_file_message)
+
+    logging.info("Sending upload file request finished: " + file_name)
 
 
 def read_upload_response_message(file_name, socket):
@@ -94,7 +31,11 @@ def read_upload_response_message(file_name, socket):
 
     response = socket.recv(BUFFER_SIZE)
 
-    logging.info("Response:\n" + response)
+    message = msg.create_message_obj(response)
+
+    logging.info("Upload Response:\n" + response)
+
+    assert isinstance(message, msg.Upload)
 
     logging.info("Reading response finished: " + file_name)
 
@@ -102,7 +43,6 @@ def read_upload_response_message(file_name, socket):
 
 
 def send_confirmation_message_to_upload_request(file_name, file_size, socket):
-
     logging.info("Sending confirmation: " + file_name)
 
     confirmation = msg.create_file_acception_message(file_name,
@@ -110,6 +50,20 @@ def send_confirmation_message_to_upload_request(file_name, file_size, socket):
     socket.sendall(confirmation)
 
     logging.info("Sending confirmation finished: " + file_name)
+
+
+def read_confirmation_message(file_name, socket):
+    logging.info("Reading confirmation message: " + file_name)
+
+    response = socket.recv(BUFFER_SIZE)
+
+    message = msg.create_message_obj(response)
+
+    logging.info("Confirmation Message:\n" + response)
+
+    assert isinstance(message, msg.Confirm)
+
+    logging.info("Reading confirmation message finished: " + file_name)
 
 
 def download_file(file_name, file_size, socket):
@@ -130,7 +84,7 @@ def download_file(file_name, file_size, socket):
     return file_contents
 
 
-def prepare_file(file_id, abs_directory_path,  file_contents):
+def string_to_file(file_id, abs_directory_path, file_contents):
     abs_file_path = os.path.join(abs_directory_path, file_id)
 
     f = open(abs_file_path, 'w+')
@@ -138,3 +92,21 @@ def prepare_file(file_id, abs_directory_path,  file_contents):
     f.write(file_contents)
 
     return f
+
+
+def upload_file(file_name, file_contents, socket):
+    logging.info("Uploading file: " + file_name + " - " +
+                 str(sys.getsizeof(file_contents)))
+    logging.info(file_contents)
+
+    socket.sendall(file_contents)
+
+    logging.info("Uploading file finished: " + file_name)
+
+
+def send_file_from_local_to_remote(file_obj, socket):
+    send_file_upload_message(file_obj.file_name, file_obj.bytes_size, socket)
+
+    read_confirmation_message(file_obj.file_name, socket)
+
+    upload_file(file_obj.file_name, file_obj.read(), socket)
