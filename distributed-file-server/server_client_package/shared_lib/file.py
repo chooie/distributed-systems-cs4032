@@ -53,6 +53,7 @@ class DistributedFile:
 def distributed_open(file_id, abs_directory_path, socket):
     """
     Read file from file server
+    :param abs_directory_path: Path to where file will be stored
     :param file_id: Unique string for file
     :param socket: Socket connection with file server
     :return: a handle to the file
