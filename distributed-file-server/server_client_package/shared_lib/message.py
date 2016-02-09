@@ -39,14 +39,22 @@ def create_file_acception_message(file_name, file_size):
     ).format(file_name, file_size)
 
 
-def create_directory_direct_message(ip, host, file_name):
+def create_directory_connect_message(file_name):
+    return (
+        "Directory\n"
+        "Connect\n"
+        "{0}\n"
+    ).format(file_name)
+
+
+def create_directory_direct_message(host, port, file_name):
     return (
         "Directory\n"
         "Direct\n"
         "{0}\n"
         "{1}\n"
         "{2}\n"
-    ).format(ip, host, file_name)
+    ).format(host, port, file_name)
 
 
 def create_message_obj(message_string):
@@ -70,14 +78,15 @@ def create_message_obj(message_string):
                 return Confirm(domain, action_type, file_name, file_size)
 
         elif domain == "Directory":
-            file_name = message_array[1]
             if action_type == "Connect":
+                file_name = message_array[2]
                 return Connect(domain, action_type, file_name)
 
             elif action_type == "Direct":
-                ip = message_array[2]
-                host = message_array[3]
-                return Direct(domain, action_type, ip, host, file_name)
+                host = message_array[2]
+                port = message_array[3]
+                file_name = message_array[4]
+                return Direct(domain, action_type, host, port, file_name)
 
     return None
 
@@ -122,8 +131,8 @@ class Connect(Message):
 
 
 class Direct(Message):
-    def __init__(self, domain, action_type, ip, host, file_name):
+    def __init__(self, domain, action_type, host, port, file_name):
         Message.__init__(self, domain, action_type)
-        self.ip = ip
         self.host = host
+        self.port = int(port)
         self.file_name = file_name

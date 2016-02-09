@@ -27,8 +27,8 @@ appropriate file server:
         
         Directory\n
         Direct\n
-        <IP address>\n
-        <Host>\n
+        <Host Address>\n
+        <Port>\n
         <File Name>\n
 
 ## Replication

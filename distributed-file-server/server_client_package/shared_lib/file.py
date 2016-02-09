@@ -6,6 +6,35 @@ from shared_lib import message as msg
 from shared_lib.constants import BUFFER_SIZE
 
 
+def establish_file_directory(file_name, socket):
+    send_directory_connect_message(file_name, socket)
+
+    return read_directory_direct_message(socket)
+
+
+def send_directory_connect_message(file_name, socket):
+    logging.info("Sending directory connect message: " + file_name)
+
+    message = msg.create_directory_connect_message(file_name)
+
+    socket.sendall(message)
+
+    logging.info("Sending directory connect message finished: " + file_name)
+
+
+def read_directory_direct_message(socket):
+    logging.info("Sending directory direct message")
+
+    response = socket.recv(BUFFER_SIZE)
+    message = msg.create_message_obj(response)
+
+    assert isinstance(message, msg.Direct)
+
+    logging.info("Sending directory direct message finished")
+
+    return message
+
+
 def send_file_download_message(file_name, socket):
     logging.info("Sending download file request: " + file_name)
 
@@ -39,7 +68,7 @@ def read_upload_response_message(file_name, socket):
 
     logging.info("Reading response finished: " + file_name)
 
-    return response
+    return message
 
 
 def send_confirmation_message_to_upload_request(file_name, file_size, socket):
