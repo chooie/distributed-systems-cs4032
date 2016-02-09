@@ -16,11 +16,19 @@ another server and perform operations on it as if it was stored locally:
     - Read the contents of the local file. 
 
 ## Directory Service
-A client initially sends a request to a directory service. The directory service
-then returns a response to direct the client to the appropriate file server:
+A client initially sends a request for a file to a directory service: 
+
+        Directory\n
+        Connect\n
+        <File Name>\n
+
+The directory service then returns a response to direct the client to the 
+appropriate file server:
         
+        Directory\n
         Direct\n
         <IP address>\n
         <Host>\n
+        <File Name>\n
 
 ## Replication

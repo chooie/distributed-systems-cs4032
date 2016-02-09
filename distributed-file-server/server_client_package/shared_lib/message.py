@@ -45,10 +45,9 @@ def create_message_obj(message_string):
     if len(message_array) > 1:
         domain = message_array[0]
         action_type = message_array[1]
-        body = message_array[2]
 
         if domain == "File":
-            file_name = body
+            file_name = message_array[2]
             if action_type == "Download":
                 return Download(domain, action_type, file_name)
 
@@ -59,6 +58,16 @@ def create_message_obj(message_string):
             elif action_type == "Confirm":
                 file_size = message_array[3]
                 return Confirm(domain, action_type, file_name, file_size)
+
+        elif domain == "Directory":
+            file_name = message_array[1]
+            if action_type == "Connect":
+                return Connect(domain, action_type, file_name)
+
+            elif action_type == "Direct":
+                ip = message_array[2]
+                host = message_array[3]
+                return Direct(domain, action_type, ip, host, file_name)
 
     return None
 
@@ -94,3 +103,17 @@ class Upload(FileSize):
 class Confirm(FileSize):
     def __init__(self, domain, action_type, file_name, file_size):
         FileSize.__init__(self, domain, action_type, file_name, file_size)
+
+
+class Connect(Message):
+    def __init__(self, domain, action_type, file_name):
+        Message.__init__(self, domain, action_type)
+        self.file_name = file_name
+
+
+class Direct(Message):
+    def __init__(self, domain, action_type, ip, host, file_name):
+        Message.__init__(self, domain, action_type)
+        self.ip = ip
+        self.host = host
+        self.file_name = file_name
