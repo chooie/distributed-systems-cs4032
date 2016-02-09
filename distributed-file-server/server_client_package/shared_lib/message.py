@@ -39,6 +39,16 @@ def create_file_acception_message(file_name, file_size):
     ).format(file_name, file_size)
 
 
+def create_directory_direct_message(ip, host, file_name):
+    return (
+        "Directory\n"
+        "Direct\n"
+        "{0}\n"
+        "{1}\n"
+        "{2}\n"
+    ).format(ip, host, file_name)
+
+
 def create_message_obj(message_string):
     message_array = message_to_array(message_string)
 

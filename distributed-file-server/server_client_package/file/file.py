@@ -8,8 +8,6 @@ from shared_lib.LocalFile import LocalFile
 from shared_lib.file import send_file_from_local_to_remote, \
     send_confirmation_message_to_upload_request, download_file
 from shared_lib.utils import run_server
-from shared_lib.DistributedFile import DistributedFile
-
 
 script_dir = os.path.dirname(__file__)  # Absolute dir the script is in
 files_path = ".files/"
