@@ -32,3 +32,7 @@ appropriate file server:
         <File Name>\n
 
 ## Replication
+A file server can be a primary or a replica. Each primary has associated
+replicas which it writes its contents to. When requesting a file from a
+directory server, the directory server can direct the client to a primary or
+one of its replicas. All writes are still done at the replica.
